@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from .serializers import GameSerializer, PlayingFieldSerializer, NearGamesSerializer
 from .models import Game, Playing_Field
 from rest_framework import viewsets, status
@@ -16,7 +15,10 @@ class GameViewSet(viewsets.ModelViewSet):
     def get_near_games(self, request):
         serializer = NearGamesSerializer(data=request.query_params)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         lng, lat = float(serializer.data['longitude']), float(serializer.data['latitude'])
         radius = serializer.data['radius_km'] / 110  # converting kilometers to degrees
@@ -30,9 +32,15 @@ class GameViewSet(viewsets.ModelViewSet):
     def add_player(self, request, pk=None):
         game = self.get_object()
         if game.players.count() >= game.players_number:
-            return Response({'error': 'Maxiumum number of players reached'}, status=status.HTTP_400_BAD_REQUEST)
-        if game.players.filter(username=(request.user.username)).count() > 0:
-            return Response({'error': 'There already exist player with that name'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                   'error': 'Maxiumum number of players reached'},
+                    status=status.HTTP_400_BAD_REQUEST
+                   )
+        if game.players.filter(username=(request.user.username)).exists():
+            return Response({
+                    'error': 'There already exist player with that name'},
+                    status=status.HTTP_400_BAD_REQUEST
+                   )
 
         game.players.add(request.user)
         game.save()
@@ -40,17 +48,31 @@ class GameViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
-    def delete_player(self, request, pk=None):
+    def remove_player(self, request, pk=None):
+        '''
+        TODO: allow game owner to remove players
+        TODO: allow admin to remove players
+        '''
+        username = request.data['username']
+        if username != request.user.username:
+            return Response(
+                {'error': 'You cannot remove this player'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         game = self.get_object()
-        player = game.players.filter(username=(request.user.username)).first()
-        if not player:
-            return Response({'error': 'There is no player with this name'}, status=status.HTTP_400_BAD_REQUEST)
+        player = game.players.filter(username=username).first()
+        if player is None:
+            return Response(
+                {'error': 'There is no player with this name'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         game.players.remove(request.user)
         game.save()
 
         return Response(status=status.HTTP_200_OK)
-        
+
 
     def perform_create(self, serializer):
         serializer.save(players=[self.request.user])

@@ -30,15 +30,14 @@ class GamesTests(APITestCase):
             street=fields[2][2], owner='MOSIR', latitude=fields[2][0], longitude=fields[2][1], price_per_hour=120)
 
         self.game1 = Game.objects.create(name='game1', date=timezone.now(),
-                            players_number=1, playing_field=self.field1)
+                                         players_number=1, playing_field=self.field1)
         self.game2 = Game.objects.create(name='game2', date=timezone.now(),
-                            players_number=4, playing_field=field2)
+                                         players_number=4, playing_field=field2)
         Game.objects.create(name='game3', date=timezone.now(),
                             players_number=5, playing_field=field3)
 
         self.client.login(username='Alex', password='password')
-        
-
+ 
     def test_get_game(self):
         """
         testing if simple get request with id works
@@ -83,16 +82,17 @@ class GamesTests(APITestCase):
         testing adding a player when there is no available space
         '''
         game = Game.objects.create(name='game4', date=timezone.now(),
-                            players_number=1, playing_field=self.field1)
+                                   players_number=1, playing_field=self.field1)
         game.players.add(User.objects.get(pk=3))
 
         response = self.client.patch('/games/4/add_player/', format='json')
 
-
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], 'Maxiumum number of players reached')
+        self.assertEqual(
+            response.data['error'],'Maxiumum number of players reached'
+        )
 
-    def test_update_game_with_existing_player(self):
+    def test_adding_player_when_same_exists(self):
         '''
         testing adding a player when there is no available space
         '''
@@ -100,9 +100,58 @@ class GamesTests(APITestCase):
 
         response = self.client.patch('/games/2/add_player/', format='json')
 
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data['error'], 'There already exist player with that name'
+        )
+
+    def test_remove_player(self):
+        '''
+        testing removing currently logged player from a game
+        '''
+        self.game2.players.add(User.objects.get(pk=1))
+
+        response = self.client.patch(
+         '/games/2/remove_player/',
+         data={'username': 'Alex'},
+         format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(self.game2.players.exists())
+
+    def test_remove_player_when_no_players(self):
+        '''
+        testing removing currently logged player from a game when one
+        is not signed to a game
+        '''
+
+        response = self.client.patch(
+         '/games/2/remove_player/',
+         data={'username': 'Alex'},
+         format='json'
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], 'There already exist player with that name')
+        self.assertEqual(
+            response.data['error'], 'There is no player with this name'
+        )
+
+    def test_remove_other_player(self):
+        '''
+        testing removing other player that one that's logged in
+        '''
+        response = self.client.patch(
+         '/games/2/remove_player/',
+         data={'username': 'Henry'},
+         format='json'
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(
+            response.data['error'], 'You cannot remove this player'
+        )
+
 
 
     # def test_get_near_games(self):
@@ -127,7 +176,11 @@ class PlayingFieldTests(APITestCase):
         testing if simple get request with id works
         """
         Playing_Field.objects.create(
-            street='street', owner='MOSIR', latitude=10, longitude=20, price_per_hour=100)
+            street='street',
+            owner='MOSIR',
+            latitude=10, longitude=20,
+            price_per_hour=100
+        )
         response = self.client.get('/fields/1/')
 
         self.assertEqual(response.data['id'], 1)
