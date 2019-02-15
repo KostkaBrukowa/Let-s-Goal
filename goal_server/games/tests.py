@@ -18,7 +18,7 @@ class GamesTests(APITestCase):
         User.objects.create_user('Henry', 'fannie1994@gmail.com', 'password')
         User.objects.create_user('Mike', 'rosella1991@hotmail.com', 'password')
 
-        fields = [(10, 10, 'Koszykowa'), 
+        fields = [(10, 10, 'Koszykowa'),
                   (20, 20, 'Wilcza'),
                   (40, 40, 'Nowowiejska')]
 
@@ -37,7 +37,7 @@ class GamesTests(APITestCase):
                             players_number=5, playing_field=field3)
 
         self.client.login(username='Alex', password='password')
- 
+
     def test_get_game(self):
         """
         testing if simple get request with id works
@@ -89,7 +89,7 @@ class GamesTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
-            response.data['error'],'Maxiumum number of players reached'
+            response.data['error'], 'Maxiumum number of players reached'
         )
 
     def test_adding_player_when_same_exists(self):
@@ -112,9 +112,9 @@ class GamesTests(APITestCase):
         self.game2.players.add(User.objects.get(pk=1))
 
         response = self.client.patch(
-         '/games/2/remove_player/',
-         data={'username': 'Alex'},
-         format='json'
+            '/games/2/remove_player/',
+            data={'username': 'Alex'},
+            format='json'
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -127,9 +127,9 @@ class GamesTests(APITestCase):
         '''
 
         response = self.client.patch(
-         '/games/2/remove_player/',
-         data={'username': 'Alex'},
-         format='json'
+            '/games/2/remove_player/',
+            data={'username': 'Alex'},
+            format='json'
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -142,17 +142,15 @@ class GamesTests(APITestCase):
         testing removing other player that one that's logged in
         '''
         response = self.client.patch(
-         '/games/2/remove_player/',
-         data={'username': 'Henry'},
-         format='json'
+            '/games/2/remove_player/',
+            data={'username': 'Henry'},
+            format='json'
         )
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(
             response.data['error'], 'You cannot remove this player'
         )
-
-
 
     # def test_get_near_games(self):
     #     """
@@ -167,7 +165,6 @@ class GamesTests(APITestCase):
     #     print(response.data)
     #     self.assertEqual(response.status_code, status.HTTP_200_OK)
     #     self.assertEqual(len(response.data['near_games']), 2)
-        
 
 
 class PlayingFieldTests(APITestCase):
