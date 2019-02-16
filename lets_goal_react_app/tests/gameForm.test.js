@@ -1,8 +1,27 @@
 /* eslint-disable no-undef */
-import gameFormReducer, { formInitialState } from '../redux/reducers/gameForm';
-import { PICK_NAME_SUCCESS, PICK_NAME_FAIL } from '../redux/actions/types';
+import gameFormReducer, { formInitialState } from '../redux/reducers/gameFormReducer';
+import {
+  PICK_NAME_SUCCESS,
+  PICK_NAME_FAIL,
+  NEW_GAME_FORM_SUBIMT_SUCCESS,
+} from '../redux/actions/types';
 
 describe('Testing Game form reducer', () => {
+  it('updates a value when sent a success', () => {
+    const state = {
+      name: {
+        value: null,
+        errors: null,
+      },
+    };
+
+    const reducedState = gameFormReducer(state, {
+      type: NEW_GAME_FORM_SUBIMT_SUCCESS,
+      payload: 'game1',
+    });
+    expect(reducedState).toEqual(formInitialState);
+  });
+
   it('updates a value when sent a success', () => {
     const reducedState = gameFormReducer(undefined, { type: PICK_NAME_SUCCESS, payload: 'game1' });
     expect(reducedState).toEqual({

@@ -5,6 +5,9 @@ import {
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import SelectedInputIcon from './icons/newGame/SelectedInputIcon';
+import UnselectedInputIcon from './icons/newGame/UnselectedInputIcon';
+
 const styles = StyleSheet.create({
   container: {
     borderWidth: 2,
@@ -22,10 +25,6 @@ const styles = StyleSheet.create({
   },
 });
 
-const InputPicture = ({ icon }) => <Icon name={icon} size={70} color="#152730" />;
-
-const SelectedPicture = () => <Icon name="check" size={70} color="white" />;
-
 const InputImage = (props) => {
   const { icon, onPress, isSelected } = props;
   return (
@@ -36,7 +35,7 @@ const InputImage = (props) => {
           isSelected ? styles.selectedBackgroud : styles.notSelectedBackground,
         ]}
       >
-        {isSelected ? <SelectedPicture /> : <InputPicture icon={icon} />}
+        {isSelected ? <SelectedInputIcon /> : <UnselectedInputIcon icon={icon} />}
       </View>
     </TouchableOpacity>
   );

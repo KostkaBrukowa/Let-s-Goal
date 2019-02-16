@@ -10,17 +10,23 @@ import {
   PICK_DATE_FAIL,
 } from './types';
 
-const BASE_URL = 'http://127.0.0.1:8000/';
+const BASE_URL = 'http://10.0.2.2:8000/';
 
 export const pickName = name => async (dispatch) => {
   try {
-    const response = await fetch(`${BASE_URL}isNameUnique&name=${name}`);
-    const { exists } = await response.json();
+    console.log(`${BASE_URL}games/is_name_unique/?name=${name}`);
+    const response = await fetch(`${BASE_URL}games/is_name_unique/?name=${name}`);
 
+    if (!response.ok) {
+      throw new Error('Bad request was sent');
+    }
+
+    const { exists } = await response.json();
     if (!exists) dispatch({ type: PICK_NAME_SUCCESS, payload: name });
     else dispatch({ type: PICK_NAME_FAIL, payload: 'There is a game with this name' });
   } catch (e) {
     dispatch({ type: PICK_NAME_FAIL, payload: 'There was a problem with connecting to a server' });
+    console.log(e);
   }
 };
 

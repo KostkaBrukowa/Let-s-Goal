@@ -10,7 +10,7 @@ export const AppNavigator = createBottomTabNavigator(
     newGame: NewGameScreen,
     events: EventsScreen,
   },
-  { initialRouteName: 'events' },
+  { initialRouteName: 'newGame' },
 );
 
 export default AppNavigator;
