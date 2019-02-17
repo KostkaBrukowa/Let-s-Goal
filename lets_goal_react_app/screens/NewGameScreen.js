@@ -7,10 +7,12 @@ import PropTypes from 'prop-types';
 import { Constants } from 'expo';
 import { connect } from 'react-redux';
 
-import DateTimePicker from '../components/DateTime';
+import DateTimePicker from '../components/formPickers/DateTime';
 import { pickName, pickPlayers, pickField } from '../redux/actions/gameFormActions';
 import { saveGame } from '../redux/actions/gameAPIActions';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
+import FourDots from '../components/FourDots';
+import NamePicker from '../components/formPickers/NamePicker';
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -65,12 +67,8 @@ export class NewGameScreen extends Component {
 
     return (
       <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container}>
-        <TextInput
-          placeholder="Name"
-          value={name}
-          onChangeText={n => this.setState({ name: n })}
-          onBlur={() => pickName(name)}
-        />
+        <NamePicker />
+        <FourDots />
         <TextInput
           placeholder="Number of players"
           value={playersNumber}

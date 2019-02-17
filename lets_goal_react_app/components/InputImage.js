@@ -7,44 +7,70 @@ import PropTypes from 'prop-types';
 
 import SelectedInputIcon from './icons/newGame/SelectedInputIcon';
 import UnselectedInputIcon from './icons/newGame/UnselectedInputIcon';
+import {
+  NEW_GAME_CIRCLE_SIZE,
+  PURPLE_APP_TINT,
+  ALMOST_WHITE_TINT,
+  NEW_GAME_ICON_SIZE,
+} from '../const/const';
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 2,
-    width: 100,
-    height: 100,
-    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  imageContainer: {
+    borderWidth: 1,
+    width: NEW_GAME_CIRCLE_SIZE,
+    height: NEW_GAME_CIRCLE_SIZE,
+    borderRadius: NEW_GAME_CIRCLE_SIZE / 2,
+    // marginTop: 5,
+  },
   selectedBackgroud: {
-    backgroundColor: '#3D124A',
+    backgroundColor: PURPLE_APP_TINT,
   },
   notSelectedBackground: {
-    backgroundColor: '#E5E9F2',
+    backgroundColor: ALMOST_WHITE_TINT,
   },
 });
 
 const InputImage = (props) => {
-  const { icon, onPress, isSelected } = props;
+  const {
+    icon, onPress, isSelected, iconSize, title,
+  } = props;
   return (
-    <TouchableOpacity onPress={onPress}>
-      <View
-        style={[
-          styles.container,
-          isSelected ? styles.selectedBackgroud : styles.notSelectedBackground,
-        ]}
-      >
-        {isSelected ? <SelectedInputIcon /> : <UnselectedInputIcon icon={icon} />}
-      </View>
-    </TouchableOpacity>
+    <View style={styles.container}>
+      <Text>{title}</Text>
+      <TouchableOpacity onPress={onPress}>
+        <View
+          style={[
+            styles.container,
+            styles.imageContainer,
+            isSelected ? styles.selectedBackgroud : styles.notSelectedBackground,
+          ]}
+        >
+          {isSelected ? (
+            <SelectedInputIcon size={iconSize} />
+          ) : (
+            <UnselectedInputIcon size={iconSize} icon={icon} />
+          )}
+        </View>
+      </TouchableOpacity>
+    </View>
   );
+};
+
+InputImage.defaultProps = {
+  iconSize: NEW_GAME_ICON_SIZE,
+  title: '',
 };
 
 InputImage.propTypes = {
   icon: PropTypes.string.isRequired,
   onPress: PropTypes.func.isRequired,
   isSelected: PropTypes.bool.isRequired,
+  iconSize: PropTypes.number,
+  title: PropTypes.string,
 };
 
 export default InputImage;

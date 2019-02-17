@@ -91,7 +91,8 @@ class GameViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        serializer.save(players=[self.request.user])
+        serializer.save()
+        # serializer.save(players=[self.request.user]) UNCOMMENT WHEN AUTHENTICATION IS READY
 
 
 class FieldsViewSet(viewsets.ReadOnlyModelViewSet):

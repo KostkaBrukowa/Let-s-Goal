@@ -14,6 +14,7 @@ const BASE_URL = 'http://10.0.2.2:8000/';
 
 export const pickName = name => async (dispatch) => {
   try {
+    if (name.length === 0) throw new Error('U need to specify a name');
     console.log(`${BASE_URL}games/is_name_unique/?name=${name}`);
     const response = await fetch(`${BASE_URL}games/is_name_unique/?name=${name}`);
 
@@ -25,7 +26,7 @@ export const pickName = name => async (dispatch) => {
     if (!exists) dispatch({ type: PICK_NAME_SUCCESS, payload: name });
     else dispatch({ type: PICK_NAME_FAIL, payload: 'There is a game with this name' });
   } catch (e) {
-    dispatch({ type: PICK_NAME_FAIL, payload: 'There was a problem with connecting to a server' });
+    dispatch({ type: PICK_NAME_FAIL, payload: e.message });
     console.log(e);
   }
 };

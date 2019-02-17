@@ -4,8 +4,8 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import InputImage from './InputImage';
-import { pickDate } from '../redux/actions/gameFormActions';
+import InputImage from '../InputImage';
+import { pickDate } from '../../redux/actions/gameFormActions';
 
 class DateTimePickerTester extends Component {
   static defaultProps = {
@@ -39,7 +39,12 @@ class DateTimePickerTester extends Component {
     // TODO ERROR HANDLING
     return (
       <View>
-        <InputImage icon="calendar" onPress={this.showDateTimePicker} isSelected={isSelected} />
+        <InputImage
+          icon="calendar"
+          onPress={this.showDateTimePicker}
+          title="Pick a date"
+          isSelected={isSelected}
+        />
         <DateTimePicker
           isVisible={isDateTimePickerVisible}
           onConfirm={this.handleDatePicked}

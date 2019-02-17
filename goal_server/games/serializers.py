@@ -15,7 +15,7 @@ class GameSerializer(serializers.ModelSerializer):
     playing_field = serializers.PrimaryKeyRelatedField(
         many=False, queryset=Playing_Field.objects.all())
     players = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=User.objects.all())
+        many=True, queryset=User.objects.all(), required=False)
 
     class Meta:
         model = Game

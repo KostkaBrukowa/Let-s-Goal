@@ -55,13 +55,14 @@ class GamesTests(APITestCase):
             'name': 'test_name',
             'date': timezone.now(),
             'players_number': 2,
-            'players': [],
+            # 'players': [],
             'playing_field': 1,
         }
         # self.client.login(username='Alex', password='password')
 
         response = self.client.post('/games/', data=game, format='json')
 
+        # print(dir(response))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['players'], [1, ])
 
