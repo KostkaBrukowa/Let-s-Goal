@@ -31,11 +31,7 @@ export class EventsScreen extends Component {
   static propTypes = {};
 
   render() {
-    return (
-      <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container}>
-        <Button onPress={() => login('mary', 'poppins')} title="submit" />
-      </ScrollView>
-    );
+    return <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container} />;
   }
 }
 

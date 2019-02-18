@@ -12,7 +12,8 @@ import { pickName, pickPlayers, pickField } from '../redux/actions/gameFormActio
 import { saveGame } from '../redux/actions/gameAPIActions';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
 import FourDots from '../components/FourDots';
-import NamePicker from '../components/formPickers/NamePicker';
+// import NamePicker from '../components/formPickers/NamePicker';
+import TextPicker from '../components/formPickers/TextPicker';
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -40,11 +41,13 @@ export class NewGameScreen extends Component {
   };
 
   static propTypes = {
-    name: PropTypes.string,
-    playersNumber: PropTypes.string,
+    name: PropTypes.object,
+    playersNumber: PropTypes.object,
     playingField: PropTypes.string,
     date: PropTypes.instanceOf(Date),
     saveGame: PropTypes.func.isRequired,
+    pickName: PropTypes.func.isRequired,
+    pickPlayers: PropTypes.func.isRequired,
   };
 
   submit = () => {
@@ -53,8 +56,8 @@ export class NewGameScreen extends Component {
     } = this.props;
 
     const game = {
-      name,
-      playersNumber,
+      name: name.value,
+      playersNumber: playersNumber.value,
       playingField,
       date,
     };
@@ -62,20 +65,29 @@ export class NewGameScreen extends Component {
   };
 
   render() {
-    const { name, playersNumber, field } = this.state;
-    const { pickName, pickPlayers, pickField } = this.props;
-
+    const { field } = this.state;
+    const {
+      name, playersNumber, pickName, pickPlayers, pickField,
+    } = this.props;
     return (
       <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container}>
-        <NamePicker />
-        <FourDots />
-        <TextInput
-          placeholder="Number of players"
-          value={playersNumber}
-          onChangeText={n => this.setState({ playersNumber: n })}
-          keyboardType="numeric"
-          onBlur={() => pickPlayers(playersNumber)}
+        <TextPicker
+          value={name.value}
+          errors={name.errors}
+          pickValue={pickName}
+          title="Pick number of players"
+          icon="pencil"
         />
+        <FourDots />
+        <TextPicker
+          value={playersNumber.value}
+          errors={playersNumber.errors}
+          pickValue={pickPlayers}
+          title="Pick number of players"
+          icon="address-book"
+          keyboardType="numeric"
+        />
+        <FourDots />
         <TextInput
           placeholder="Field"
           value={field}
@@ -92,8 +104,8 @@ export class NewGameScreen extends Component {
 }
 
 const mapStateToProps = state => ({
-  name: state.gameForm.name.value,
-  playersNumber: state.gameForm.playersNumber.value,
+  name: state.gameForm.name,
+  playersNumber: state.gameForm.playersNumber,
   playingField: state.gameForm.playingField.value,
   date: state.gameForm.date.value,
 });

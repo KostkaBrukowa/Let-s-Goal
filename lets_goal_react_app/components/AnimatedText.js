@@ -10,6 +10,7 @@ export default class AnimatedText extends Component {
   static propTypes = {
     isTextInputVisible: PropTypes.bool.isRequired,
     onBlur: PropTypes.func.isRequired,
+    keyboardType: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -67,17 +68,18 @@ export default class AnimatedText extends Component {
 
   render() {
     const { isAnimationRunning, value } = this.state;
-    const { isTextInputVisible, onBlur } = this.props;
+    const { isTextInputVisible, onBlur, keyboardType } = this.props;
     const { width } = Dimensions.get('window');
     return (
       <View>
-        {(isAnimationRunning || isTextInputVisible || true) && (
+        {(isAnimationRunning || isTextInputVisible) && (
           <AnimatedTextInput
             ref={this.textInput}
             onBlur={() => onBlur(value)}
-            placeholder={!isTextInputVisible ? '' : 'Name'}
+            placeholder={!isTextInputVisible ? '' : ''}
             value={!isTextInputVisible ? '' : value}
             onChangeText={value => this.setState({ value })}
+            keyboardType={keyboardType}
             style={{
               width: this.interpolateTo(0.75 * width),
               borderWidth: this.interpolateTo(1),

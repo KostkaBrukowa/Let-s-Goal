@@ -18,6 +18,7 @@ export const saveGame = ({
       playing_field: playingField,
       date,
     };
+    console.log(urlFriendlyData);
     const options = {
       method: 'POST',
       body: JSON.stringify(urlFriendlyData),

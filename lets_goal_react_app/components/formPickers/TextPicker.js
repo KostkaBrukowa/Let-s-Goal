@@ -23,11 +23,16 @@ const styles = StyleSheet.create({
   },
 });
 
-class NamePicker extends Component {
+export default class NumberPicker extends Component {
+  static defaultProps = {
+    keyboardType: 'default',
+  };
+
   static propTypes = {
-    name: PropTypes.string,
+    value: PropTypes.string,
     errors: PropTypes.string,
-    pickName: PropTypes.func.isRequired,
+    pickValue: PropTypes.func.isRequired,
+    keyboardType: PropTypes.string,
   };
 
   state = {
@@ -35,8 +40,8 @@ class NamePicker extends Component {
   };
 
   componentDidUpdate = (prevProps) => {
-    const { name, errors } = this.props;
-    if (prevProps.name != name && !errors) {
+    const { value, errors } = this.props;
+    if (prevProps.value !== value && value && !errors) {
       this.setState({ isTextInputVisible: false });
     }
   };
@@ -49,31 +54,37 @@ class NamePicker extends Component {
 
   render() {
     const { isTextInputVisible } = this.state;
-    const { name, errors, pickName } = this.props;
-    const isSelected = name != null && errors == null;
+    const {
+      value, errors, pickValue, title, icon, keyboardType,
+    } = this.props;
+    const isSelected = value != null && errors == null;
     return (
       <View style={[styles.container]}>
-        <Text>Pick a name</Text>
+        <Text>{title}</Text>
         <View style={styles.imageInputContainer}>
           <InputImage
             iconSize={50}
-            icon="pencil"
+            icon={icon}
             onPress={this.toggleInput}
             isSelected={isSelected}
           />
-          <AnimatedText isTextInputVisible={isTextInputVisible} onBlur={pickName} />
+          <AnimatedText
+            keyboardType={keyboardType}
+            isTextInputVisible={isTextInputVisible}
+            onBlur={pickValue}
+          />
         </View>
       </View>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  name: state.gameForm.name.value,
-  errors: state.gameForm.name.errors,
-});
+// const mapStateToProps = state => ({
+//   name: state.gameForm.name.value,
+//   errors: state.gameForm.name.errors,
+// });
 
-export default connect(
-  mapStateToProps,
-  { pickName },
-)(NamePicker);
+// export default connect(
+//   mapStateToProps,
+//   { pickName },
+// )(NamePicker);
