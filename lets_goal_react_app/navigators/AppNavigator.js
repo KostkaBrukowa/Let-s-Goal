@@ -1,13 +1,13 @@
 import { createBottomTabNavigator } from 'react-navigation';
 
 import JoinScreen from '../screens/JoinScreen';
-import NewGameScreen from '../screens/NewGameScreen';
+import NewGameNavigator from './NewGameNavigator';
 import EventsScreen from '../screens/EventsScreen';
 
 export const AppNavigator = createBottomTabNavigator(
   {
     joinGame: JoinScreen,
-    newGame: NewGameScreen,
+    newGame: NewGameNavigator,
     events: EventsScreen,
   },
   { initialRouteName: 'newGame' },

@@ -1,15 +1,10 @@
 /* eslint-disable react/require-default-props */
 import React, { Component } from 'react';
-import {
-  View, Text, StyleSheet, TextInput, Dimensions, Animated,
-} from 'react-native';
-import { connect } from 'react-redux';
+import { View, Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
 import InputImage from '../InputImage';
-import { NEW_GAME_CIRCLE_SIZE } from '../../const/const';
 import AnimatedText from '../AnimatedText';
-import { pickName } from '../../redux/actions/gameFormActions';
 
 const styles = StyleSheet.create({
   container: {
@@ -26,6 +21,8 @@ const styles = StyleSheet.create({
 export default class NumberPicker extends Component {
   static defaultProps = {
     keyboardType: 'default',
+    title: '',
+    width: 0.75,
   };
 
   static propTypes = {
@@ -33,6 +30,9 @@ export default class NumberPicker extends Component {
     errors: PropTypes.string,
     pickValue: PropTypes.func.isRequired,
     keyboardType: PropTypes.string,
+    title: PropTypes.string,
+    icon: PropTypes.string.isRequired,
+    width: PropTypes.number,
   };
 
   state = {
@@ -55,14 +55,14 @@ export default class NumberPicker extends Component {
   render() {
     const { isTextInputVisible } = this.state;
     const {
-      value, errors, pickValue, title, icon, keyboardType,
+      value, errors, pickValue, title, icon, keyboardType, width,
     } = this.props;
     const isSelected = value != null && errors == null;
     return (
       <View style={[styles.container]}>
-        <Text>{title}</Text>
         <View style={styles.imageInputContainer}>
           <InputImage
+            title={title}
             iconSize={50}
             icon={icon}
             onPress={this.toggleInput}
@@ -72,6 +72,7 @@ export default class NumberPicker extends Component {
             keyboardType={keyboardType}
             isTextInputVisible={isTextInputVisible}
             onBlur={pickValue}
+            widthPart={width}
           />
         </View>
       </View>

@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     width: NEW_GAME_CIRCLE_SIZE,
     height: NEW_GAME_CIRCLE_SIZE,
     borderRadius: NEW_GAME_CIRCLE_SIZE / 2,
-    // marginTop: 5,
+    marginTop: 9,
   },
   selectedBackgroud: {
     backgroundColor: PURPLE_APP_TINT,
@@ -49,11 +49,7 @@ const InputImage = (props) => {
             isSelected ? styles.selectedBackgroud : styles.notSelectedBackground,
           ]}
         >
-          {isSelected ? (
-            <SelectedInputIcon size={iconSize} />
-          ) : (
-            <UnselectedInputIcon size={iconSize} icon={icon} />
-          )}
+          {isSelected ? <SelectedInputIcon /> : <UnselectedInputIcon size={iconSize} icon={icon} />}
         </View>
       </TouchableOpacity>
     </View>

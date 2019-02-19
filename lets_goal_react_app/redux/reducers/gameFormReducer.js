@@ -8,6 +8,7 @@ import {
   PICK_DATE_SUCCESS,
   PICK_DATE_FAIL,
   NEW_GAME_FORM_SUBIMT_SUCCESS,
+  NEW_GAME_FORM_FAIL,
 } from '../actions/types';
 
 export const formInitialState = {
@@ -47,6 +48,12 @@ export default function (state = formInitialState, action) {
   switch (action.type) {
     case NEW_GAME_FORM_SUBIMT_SUCCESS:
       return formInitialState;
+
+    case NEW_GAME_FORM_FAIL:
+      return {
+        ...state,
+        errors: action.payload,
+      };
 
     case PICK_NAME_SUCCESS:
       return success(state, 'name', action.payload);

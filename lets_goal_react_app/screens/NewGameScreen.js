@@ -1,7 +1,7 @@
 /* eslint-disable react/require-default-props */
 import React, { Component } from 'react';
 import {
-  View, Text, Button, ScrollView, TextInput, StyleSheet,
+  Button, ScrollView, TextInput, StyleSheet,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { Constants } from 'expo';
@@ -12,31 +12,23 @@ import { pickName, pickPlayers, pickField } from '../redux/actions/gameFormActio
 import { saveGame } from '../redux/actions/gameAPIActions';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
 import FourDots from '../components/FourDots';
-// import NamePicker from '../components/formPickers/NamePicker';
 import TextPicker from '../components/formPickers/TextPicker';
+import FieldPicker from '../components/formPickers/FieldPicker';
 
 const styles = StyleSheet.create({
   scrollStyle: {
-    marginTop: Constants.statusBarHeight,
+    marginTop: Constants.statusBarHeight + 9,
     flex: 1,
   },
   container: {
-    justifyContent: 'space-evenly',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    flex: 1,
+    // flex: 1,
   },
 });
 
 export class NewGameScreen extends Component {
-  static navigationOptions = {
-    tabBarLabel: 'Create',
-    tabBarIcon: BottomNavIcon('md-add'),
-    title: 'Create game',
-  };
-
   state = {
-    name: '',
-    playersNumber: '',
     field: '',
   };
 
@@ -67,7 +59,7 @@ export class NewGameScreen extends Component {
   render() {
     const { field } = this.state;
     const {
-      name, playersNumber, pickName, pickPlayers, pickField,
+      name, playersNumber, pickName, pickPlayers, navigation,
     } = this.props;
     return (
       <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container}>
@@ -75,7 +67,7 @@ export class NewGameScreen extends Component {
           value={name.value}
           errors={name.errors}
           pickValue={pickName}
-          title="Pick number of players"
+          title="Pick a name"
           icon="pencil"
         />
         <FourDots />
@@ -84,17 +76,13 @@ export class NewGameScreen extends Component {
           errors={playersNumber.errors}
           pickValue={pickPlayers}
           title="Pick number of players"
-          icon="address-book"
+          icon="torsos-all"
           keyboardType="numeric"
+          width={0.25}
         />
         <FourDots />
-        <TextInput
-          placeholder="Field"
-          value={field}
-          keyboardType="numeric"
-          onChangeText={f => this.setState({ field: f })}
-          onBlur={() => pickField(field)}
-        />
+        <FieldPicker navigation={navigation} />
+        <FourDots />
 
         <DateTimePicker />
         <Button onPress={this.submit} title="submit" />

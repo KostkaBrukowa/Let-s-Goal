@@ -1,16 +1,28 @@
 import React, { Component } from 'react';
 import {
-  View, Animated, Dimensions, TextInput,
+  View, Animated, Dimensions, TextInput, StyleSheet,
 } from 'react-native';
 import PropTypes from 'prop-types';
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
+const styles = StyleSheet.create({
+  inputText: {
+    textAlign: 'center',
+  },
+});
+
 export default class AnimatedText extends Component {
+  static defaultProps = {
+    keyboardType: 'default',
+    widthPart: 0.75,
+  };
+
   static propTypes = {
     isTextInputVisible: PropTypes.bool.isRequired,
     onBlur: PropTypes.func.isRequired,
-    keyboardType: PropTypes.string.isRequired,
+    keyboardType: PropTypes.string,
+    widthPart: PropTypes.number,
   };
 
   constructor(props) {
@@ -68,8 +80,17 @@ export default class AnimatedText extends Component {
 
   render() {
     const { isAnimationRunning, value } = this.state;
-    const { isTextInputVisible, onBlur, keyboardType } = this.props;
+    const {
+      isTextInputVisible, onBlur, keyboardType, widthPart,
+    } = this.props;
     const { width } = Dimensions.get('window');
+    const interpolatedStyle = {
+      width: this.interpolateTo(widthPart * width),
+      borderWidth: this.interpolateTo(1),
+      borderRadius: this.interpolateTo(15),
+      height: this.interpolateTo(35),
+      marginTop: this.interpolateTo(20),
+    };
     return (
       <View>
         {(isAnimationRunning || isTextInputVisible) && (
@@ -80,14 +101,7 @@ export default class AnimatedText extends Component {
             value={!isTextInputVisible ? '' : value}
             onChangeText={value => this.setState({ value })}
             keyboardType={keyboardType}
-            style={{
-              width: this.interpolateTo(0.75 * width),
-              borderWidth: this.interpolateTo(1),
-              borderRadius: this.interpolateTo(15),
-              height: this.interpolateTo(35),
-              marginTop: this.interpolateTo(20),
-              textAlign: 'center',
-            }}
+            style={[interpolatedStyle, styles.inputText]}
           />
         )}
       </View>

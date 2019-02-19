@@ -14,7 +14,15 @@ const styles = StyleSheet.create({
 const Dot = ({ bgColor }) => <View style={[styles.dot, { backgroundColor: bgColor }]} />;
 
 export default props => (
-  <View style={{ height: 60, justifyContent: 'space-between', alignItems: 'center' }}>
+  <View
+    style={{
+      height: 60,
+      marginTop: 20,
+      marginBottom: 20,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    }}
+  >
     <Dot bgColor="white" />
     <Dot bgColor="#d1d3cf" />
     <Dot bgColor="#7d8889" />

@@ -1,4 +1,4 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/Foundation';
 
-export default ({ size }) => <Icon name="check" size={size} color="white" />;
+export default () => <Icon name="check" size={50} color="white" />;

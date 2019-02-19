@@ -3,6 +3,7 @@ import {
   LIST_USERS_GAMES,
   LIST_NEAR_GAMES,
   NEW_GAME_FORM_SUBIMT_SUCCESS,
+  NEW_GAME_FORM_FAIL,
 } from './types';
 
 const BASE_URL = 'http://10.0.2.2:8000/';
@@ -18,7 +19,6 @@ export const saveGame = ({
       playing_field: playingField,
       date,
     };
-    console.log(urlFriendlyData);
     const options = {
       method: 'POST',
       body: JSON.stringify(urlFriendlyData),
@@ -30,13 +30,13 @@ export const saveGame = ({
 
     if (!response.ok) {
       const text = await response.text();
-      throw text;
+      dispatch({ type: NEW_GAME_FORM_FAIL, payload: text });
     }
 
     const newGame = await response.json();
 
     dispatch({ type: NEW_GAME_FORM_SUBIMT_SUCCESS, payload: newGame });
   } catch (e) {
-    console.log(e);
+    console.log(e.message);
   }
 };
