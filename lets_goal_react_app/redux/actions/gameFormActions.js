@@ -47,11 +47,14 @@ export const pickDate = date => (dispatch) => {
 };
 
 export const pickPlayers = (playersNumber) => {
-  if (!isNaN(+playersNumber) && playersNumber > 2 && playersNumber < 20) {
+  if (!isNaN(+playersNumber) && playersNumber > 2 && playersNumber <= 20) {
     return { type: PICK_PLAYER_NUMBER_SUCCESS, payload: playersNumber };
   }
 
-  return { type: PICK_PLAYER_NUMBER_FAIL, payload: 'Wrong number of players' };
+  return {
+    type: PICK_PLAYER_NUMBER_FAIL,
+    payload: 'Wrong number of players. You should pick a number between 3 and 20',
+  };
 };
 
 export const pickField = field => ({

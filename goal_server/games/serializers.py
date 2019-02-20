@@ -25,7 +25,6 @@ class GameSerializer(serializers.ModelSerializer):
 class NearGamesSerializer(serializers.Serializer):
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6)
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6)
-    radius_km = serializers.FloatField(min_value=0, max_value=20000)
 
 
 class UniqueNameSerializer(serializers.Serializer):

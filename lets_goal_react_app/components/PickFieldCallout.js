@@ -42,9 +42,7 @@ const styles = StyleSheet.create({
   },
 });
 
-function PickFieldCallout({
-  street, owner, price, onPress,
-}) {
+function PickFieldCallout({ street, owner, price }) {
   const priceText = `Price: ${price}$ / h`;
   return (
     <View style={styles.container}>
@@ -55,15 +53,9 @@ function PickFieldCallout({
       <View style={styles.priceContainer}>
         <Text style={styles.streetName}>{priceText}</Text>
       </View>
-      <TouchableOpacity
-        onPress={() => {
-          console.log('picked');
-        }}
-      >
-        <View style={styles.buttonContainer}>
-          <Text style={styles.buttonTitle}>Pick</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <Text style={styles.buttonTitle}>Pick</Text>
+      </View>
       {/* <Button title="dupa" onPress={() => {}} /> */}
     </View>
   );

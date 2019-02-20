@@ -3,7 +3,8 @@ from .models import Game, Playing_Field
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import action
+from rest_framework.decorators import action, renderer_classes
+from rest_framework.renderers import JSONRenderer
 
 
 class GameViewSet(viewsets.ModelViewSet):
@@ -22,11 +23,10 @@ class GameViewSet(viewsets.ModelViewSet):
 
         lng, lat = float(serializer.data['longitude']), float(
             serializer.data['latitude'])
-        radius = serializer.data['radius_km'] / \
-            110  # converting kilometers to degrees
+        radius = 1  # converting kilometers to degrees
 
         near_games = (Game.objects.filter(playing_field__longitude__range=(lng-radius, lng+radius))
-                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius)))
+                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius))).values()
 
         return Response({'near_games': near_games}, status=status.HTTP_200_OK)
 
@@ -101,3 +101,22 @@ class FieldsViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Playing_Field.objects.all()
     serializer_class = PlayingFieldSerializer
+
+    @action(detail=False, methods=['get'])
+    @renderer_classes((JSONRenderer,))
+    def get_near_fields(self, request):
+        serializer = NearGamesSerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        lng, lat = float(serializer.data['longitude']), float(
+            serializer.data['latitude'])
+        radius = 1
+
+        near_fields = (Playing_Field.objects.filter(longitude__range=(lng-radius, lng+radius))
+                       .filter(latitude__range=(lat-radius, lat+radius))).values()
+
+        return Response({'near_fields': near_fields}, status=status.HTTP_200_OK)

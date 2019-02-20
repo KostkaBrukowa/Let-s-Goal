@@ -1,11 +1,21 @@
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import {
+  View, Text, StyleSheet, ImageBackground,
+} from 'react-native';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import InputImage from '../InputImage';
 import { pickDate } from '../../redux/actions/gameFormActions';
+
+const styles = StyleSheet.create({
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    fontSize: 17,
+  },
+});
 
 class DateTimePickerTester extends Component {
   static defaultProps = {
@@ -15,6 +25,7 @@ class DateTimePickerTester extends Component {
   static propTypes = {
     pickDate: PropTypes.func.isRequired,
     date: PropTypes.instanceOf(Date),
+    dateErrors: PropTypes.string,
   };
 
   state = {
@@ -34,16 +45,18 @@ class DateTimePickerTester extends Component {
 
   render() {
     const { isDateTimePickerVisible } = this.state;
-    const { date } = this.props;
-    const isSelected = date != null; // TODO and there is no errors
+    const { date, dateErrors } = this.props;
+    const isSelected = date != null && !dateErrors; // TODO and there is no errors
     // TODO ERROR HANDLING
     return (
       <View>
+        {/* <ImageBackground  */}
         <InputImage
           icon="calendar"
           onPress={this.showDateTimePicker}
           title="Pick a date"
           isSelected={isSelected}
+          isInvalid={dateErrors != null}
         />
         <DateTimePicker
           isVisible={isDateTimePickerVisible}
@@ -52,6 +65,7 @@ class DateTimePickerTester extends Component {
           mode="datetime"
           date={date || undefined}
         />
+        {dateErrors && <Text style={styles.error}>{dateErrors}</Text>}
       </View>
     );
   }
@@ -59,6 +73,7 @@ class DateTimePickerTester extends Component {
 
 const mapStateToProps = state => ({
   date: state.gameForm.date.value,
+  dateErrors: state.gameForm.date.errors,
 });
 
 export default connect(

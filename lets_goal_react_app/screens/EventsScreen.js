@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  View, Text, Button, StyleSheet, ScrollView, TextInput,
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  ImageBackground,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { Constants } from 'expo';
@@ -34,6 +40,10 @@ export class EventsScreen extends Component {
   render() {
     return (
       <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container}>
+        <ImageBackground
+          style={{ width: '100%', height: '100%' }}
+          source={require('../assets/images/background-field.jpg')}
+        />
       </ScrollView>
     );
   }

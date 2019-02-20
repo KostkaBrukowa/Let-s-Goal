@@ -1,7 +1,7 @@
+/* eslint-disable react/require-default-props */
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
-import { Text } from 'react-native';
 import { MapView } from 'expo';
-import { Marker, Callout } from 'react-native-maps';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -16,9 +16,13 @@ const defaultRegion = {
 };
 
 class Map extends React.Component {
+  static navigationOptions = {
+    title: 'Pick field',
+  };
+
   static propTypes = {
-    // eslint-disable-next-line react/forbid-prop-types
     fields: PropTypes.array.isRequired,
+    chosenField: PropTypes.number,
     fetchNearFields: PropTypes.func.isRequired,
   };
 
@@ -26,16 +30,40 @@ class Map extends React.Component {
 
   componentDidMount = () => {
     const { fetchNearFields } = this.props;
-    fetchNearFields({ longitude: 10, latitude: 10 });
+    fetchNearFields({ longitude: defaultRegion.longitude, latitude: defaultRegion.latitude });
   };
 
-  onRegionChange = (region) => {};
+  onRegionChange = (newRegion) => {
+    const { region } = this.state;
+    const diff = (x, y) => Math.abs(x - y);
+
+    if (
+      diff(region.latitude, newRegion.latitude) > 0.5
+      || diff(region.longitude, newRegion.longitude) > 0.5
+    ) {
+      const { longitude, latitude } = newRegion;
+      const { fetchNearFields } = this.props;
+
+      this.setState({ region: newRegion });
+      fetchNearFields({ longitude, latitude });
+    }
+  };
+
+  componentDidUpdate = (prevProps) => {
+    const { chosenField: prevChosenField } = prevProps;
+    const { chosenField, navigation } = this.props;
+    if (chosenField != null && prevChosenField !== chosenField) {
+      navigation.goBack();
+    }
+  };
 
   render() {
     const { region } = this.state;
     const { fields } = this.props;
 
-    const fieldMarkers = fields.map(field => <PickFieldMarker {...field} />);
+    const fieldMarkers = fields.map(field => (
+      <PickFieldMarker key={field.id} price={field.price_per_hour} {...field} />
+    ));
     return (
       <MapView style={{ flex: 1 }} initialRegion={region} onRegionChange={this.onRegionChange}>
         {fieldMarkers}
@@ -44,7 +72,10 @@ class Map extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({ fields: state.gameAPI.nearFields });
+const mapStateToProps = state => ({
+  fields: state.gameAPI.nearFields,
+  chosenField: state.gameForm.playingField.value,
+});
 
 export default connect(
   mapStateToProps,

@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageContainer: {
-    borderWidth: 1,
     width: NEW_GAME_CIRCLE_SIZE,
     height: NEW_GAME_CIRCLE_SIZE,
     borderRadius: NEW_GAME_CIRCLE_SIZE / 2,
@@ -32,24 +31,36 @@ const styles = StyleSheet.create({
   notSelectedBackground: {
     backgroundColor: ALMOST_WHITE_TINT,
   },
+  error: {
+    borderColor: 'red',
+  },
+  title: {
+    color: 'white',
+    fontSize: 17,
+  },
 });
 
 const InputImage = (props) => {
   const {
-    icon, onPress, isSelected, iconSize, title,
+    icon, onPress, isSelected, iconSize, title, isInvalid,
   } = props;
   return (
-    <View style={styles.container}>
-      <Text>{title}</Text>
+    <View style={[styles.container]}>
+      <Text style={styles.title}>{title}</Text>
       <TouchableOpacity onPress={onPress}>
         <View
           style={[
             styles.container,
             styles.imageContainer,
             isSelected ? styles.selectedBackgroud : styles.notSelectedBackground,
+            isInvalid ? null : null,
           ]}
         >
-          {isSelected ? <SelectedInputIcon /> : <UnselectedInputIcon size={iconSize} icon={icon} />}
+          {isSelected ? (
+            <SelectedInputIcon />
+          ) : (
+            <UnselectedInputIcon isInvalid={isInvalid} size={iconSize} icon={icon} />
+          )}
         </View>
       </TouchableOpacity>
     </View>
@@ -67,6 +78,7 @@ InputImage.propTypes = {
   isSelected: PropTypes.bool.isRequired,
   iconSize: PropTypes.number,
   title: PropTypes.string,
+  isInvalid: PropTypes.bool.isRequired,
 };
 
 export default InputImage;

@@ -9,6 +9,9 @@ const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 const styles = StyleSheet.create({
   inputText: {
     textAlign: 'center',
+    color: 'white',
+    borderColor: 'white',
+    fontSize: 16,
   },
 });
 

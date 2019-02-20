@@ -1,24 +1,36 @@
-import React, { Component } from 'react';
-import { Text, View } from 'react-native';
+/* eslint-disable react/require-default-props */
+import React from 'react';
+import { View } from 'react-native';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import InputImage from '../InputImage';
 
-export default class FieldPicker extends Component {
-  state = { a: 1 };
+const FieldPicker = (props) => {
+  const { navigation, field, fieldErrors } = props;
+  const isSelected = field != null && !fieldErrors;
+  return (
+    <View>
+      <InputImage
+        icon="map"
+        iconSize={50}
+        onPress={() => navigation.navigate('map')}
+        isSelected={isSelected}
+        title="Pick a field"
+        isInvalid={fieldErrors != null}
+      />
+    </View>
+  );
+};
 
-  render() {
-    const { navigation } = this.props;
+FieldPicker.propTypes = {
+  field: PropTypes.number,
+  fieldErrors: PropTypes.string,
+};
 
-    return (
-      <View>
-        <InputImage
-          icon="map"
-          iconSize={50}
-          onPress={() => navigation.navigate('map')}
-          isSelected={false}
-          title="Pick a field"
-        />
-      </View>
-    );
-  }
-}
+const mapStateToProps = state => ({
+  field: state.gameForm.playingField.value,
+  fieldErrors: state.gameForm.playingField.errors,
+});
+
+export default connect(mapStateToProps)(FieldPicker);

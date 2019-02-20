@@ -16,6 +16,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    fontSize: 17,
+  },
 });
 
 export default class NumberPicker extends Component {
@@ -67,7 +72,9 @@ export default class NumberPicker extends Component {
             icon={icon}
             onPress={this.toggleInput}
             isSelected={isSelected}
+            isInvalid={errors != null}
           />
+          {errors && <Text style={styles.error}>{errors}</Text>}
           <AnimatedText
             keyboardType={keyboardType}
             isTextInputVisible={isTextInputVisible}
@@ -79,13 +86,3 @@ export default class NumberPicker extends Component {
     );
   }
 }
-
-// const mapStateToProps = state => ({
-//   name: state.gameForm.name.value,
-//   errors: state.gameForm.name.errors,
-// });
-
-// export default connect(
-//   mapStateToProps,
-//   { pickName },
-// )(NamePicker);
