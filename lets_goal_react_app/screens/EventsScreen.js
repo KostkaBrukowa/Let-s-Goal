@@ -8,6 +8,7 @@ import { Constants } from 'expo';
 
 import { login } from '../redux/actions/auth';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
+import PickFieldCallout from '../components/PickFieldCallout';
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -31,7 +32,10 @@ export class EventsScreen extends Component {
   static propTypes = {};
 
   render() {
-    return <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container} />;
+    return (
+      <ScrollView style={styles.scrollStyle} contentContainerStyle={styles.container}>
+      </ScrollView>
+    );
   }
 }
 

@@ -2,6 +2,7 @@ import {
   SAVE_GAME,
   LIST_USERS_GAMES,
   LIST_NEAR_GAMES,
+  LIST_NEAR_FIELDS,
   NEW_GAME_FORM_SUBIMT_SUCCESS,
   NEW_GAME_FORM_FAIL,
 } from './types';
@@ -39,4 +40,15 @@ export const saveGame = ({
   } catch (e) {
     console.log(e.message);
   }
+};
+
+export const fetchNearFields = ({ longitude, latitude }) => (dispatch) => {
+  const field = {
+    street: 'Pine St',
+    owner: 'Playland Bar',
+    longitude: -122.41977671161294,
+    latitude: 37.7897186477564,
+    price: 110,
+  };
+  dispatch({ type: LIST_NEAR_FIELDS, payload: [field] });
 };

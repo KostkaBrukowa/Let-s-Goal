@@ -9,7 +9,10 @@ const NewGameNavigator = createStackNavigator(
     map: MapScreen,
     newGame: NewGameScreen,
   },
-  { initialRouteName: 'newGame' },
+  {
+    initialRouteName: 'map',
+    headerLayoutPreset: 'center',
+  },
 );
 
 NewGameNavigator.navigationOptions = {

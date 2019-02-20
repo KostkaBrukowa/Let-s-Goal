@@ -1,10 +1,7 @@
 /* eslint-disable react/require-default-props */
 import React, { Component } from 'react';
-import {
-  Button, ScrollView, TextInput, StyleSheet,
-} from 'react-native';
+import { Button, ScrollView, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { Constants } from 'expo';
 import { connect } from 'react-redux';
 
 import DateTimePicker from '../components/formPickers/DateTime';
@@ -17,7 +14,9 @@ import FieldPicker from '../components/formPickers/FieldPicker';
 
 const styles = StyleSheet.create({
   scrollStyle: {
-    marginTop: Constants.statusBarHeight + 9,
+    // marginTop: Constants.statusBarHeight + 9,
+    paddingTop: '5%',
+    // paddingBottom: '5%',
     flex: 1,
   },
   container: {
@@ -28,6 +27,12 @@ const styles = StyleSheet.create({
 });
 
 export class NewGameScreen extends Component {
+  static navigationOptions = {
+    tabBarLabel: 'Create',
+    tabBarIcon: BottomNavIcon('md-add'),
+    title: 'Create game',
+  };
+
   state = {
     field: '',
   };
