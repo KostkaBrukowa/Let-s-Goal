@@ -1,9 +1,10 @@
-from .serializers import GameSerializer, PlayingFieldSerializer, NearGamesSerializer
+from .serializers import GameSerializer, PlayingFieldSerializer, NearGamesSerializer, UniqueNameSerializer
 from .models import Game, Playing_Field
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import action
+from rest_framework.decorators import action, renderer_classes
+from rest_framework.renderers import JSONRenderer
 
 
 class GameViewSet(viewsets.ModelViewSet):
@@ -20,27 +21,43 @@ class GameViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        lng, lat = float(serializer.data['longitude']), float(serializer.data['latitude'])
-        radius = serializer.data['radius_km'] / 110  # converting kilometers to degrees
+        lng, lat = float(serializer.data['longitude']), float(
+            serializer.data['latitude'])
+        radius = 1  # converting kilometers to degrees
 
         near_games = (Game.objects.filter(playing_field__longitude__range=(lng-radius, lng+radius))
-                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius)))
+                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius))).values()
 
         return Response({'near_games': near_games}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def is_name_unique(self, request):
+        serializer = UniqueNameSerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        name = serializer.data['name']  # converting kilometers to degrees
+
+        exists = Game.objects.filter(name=name).exists()
+
+        return Response({'exists': exists}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
     def add_player(self, request, pk=None):
         game = self.get_object()
         if game.players.count() >= game.players_number:
             return Response({
-                   'error': 'Maxiumum number of players reached'},
-                    status=status.HTTP_400_BAD_REQUEST
-                   )
+                'error': 'Maxiumum number of players reached'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if game.players.filter(username=(request.user.username)).exists():
             return Response({
-                    'error': 'There already exist player with that name'},
-                    status=status.HTTP_400_BAD_REQUEST
-                   )
+                'error': 'There already exist player with that name'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         game.players.add(request.user)
         game.save()
@@ -73,9 +90,9 @@ class GameViewSet(viewsets.ModelViewSet):
 
         return Response(status=status.HTTP_200_OK)
 
-
     def perform_create(self, serializer):
-        serializer.save(players=[self.request.user])
+        serializer.save()
+        # serializer.save(players=[self.request.user]) UNCOMMENT WHEN AUTHENTICATION IS READY
 
 
 class FieldsViewSet(viewsets.ReadOnlyModelViewSet):
@@ -84,3 +101,22 @@ class FieldsViewSet(viewsets.ReadOnlyModelViewSet):
     """
     queryset = Playing_Field.objects.all()
     serializer_class = PlayingFieldSerializer
+
+    @action(detail=False, methods=['get'])
+    @renderer_classes((JSONRenderer,))
+    def get_near_fields(self, request):
+        serializer = NearGamesSerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        lng, lat = float(serializer.data['longitude']), float(
+            serializer.data['latitude'])
+        radius = 1
+
+        near_fields = (Playing_Field.objects.filter(longitude__range=(lng-radius, lng+radius))
+                       .filter(latitude__range=(lat-radius, lat+radius))).values()
+
+        return Response({'near_fields': near_fields}, status=status.HTTP_200_OK)

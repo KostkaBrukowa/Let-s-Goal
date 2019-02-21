@@ -1,0 +1,38 @@
+from django.contrib.auth.models import User
+from django.utils import timezone
+from games.models import Game, Playing_Field
+
+
+User.objects.create_user('Alex', 'alex@gmail.com', 'password')
+User.objects.create_user('Mark', 'floy1980@hotmail.com', 'password')
+User.objects.create_user('Henry', 'fannie1994@gmail.com', 'password')
+User.objects.create_user('Mike', 'rosella1991@hotmail.com', 'password')
+
+fields = [(10, 10, 'Koszykowa'),
+            (20, 20, 'Wilcza'),
+            (40, 40, 'Nowowiejska')]
+
+field1 = Playing_Field.objects.create(
+    street=fields[0][2], owner='MOSIR', latitude=fields[0][0], longitude=fields[0][1], price_per_hour=100)
+field2 = Playing_Field.objects.create(
+    street=fields[1][2], owner='MOSIR', latitude=fields[1][0], longitude=fields[1][1], price_per_hour=110)
+field3 = Playing_Field.objects.create(
+    street=fields[2][2], owner='MOSIR', latitude=fields[2][0], longitude=fields[2][1], price_per_hour=120)
+
+game1 = Game.objects.create(name='game1', date=timezone.now(),
+                                    players_number=1, playing_field=field1)
+game2 = Game.objects.create(name='game2', date=timezone.now(),
+                                    players_number=4, playing_field=field2)
+Game.objects.create(name='game3', date=timezone.now(),
+                    players_number=5, playing_field=field3)
+
+fields = [(37.7897186477564, -122.41977671161294, 'Pine St'),
+    (37.78085239033715, -122.41177333518863, 'Larch St'),
+    (37.78187868472051, -122.41177333518863, 'Golden Gate Ave')]
+
+field1 = Playing_Field.objects.create(
+    street=fields[0][2], owner='Brendas French food', latitude=fields[0][0], longitude=fields[0][1], price_per_hour=100)
+field2 = Playing_Field.objects.create(
+    street=fields[1][2], owner='Shell', latitude=fields[1][0], longitude=fields[1][1], price_per_hour=110)
+field3 = Playing_Field.objects.create(
+    street=fields[2][2], owner='San Francisco City Hall', latitude=fields[2][0], longitude=fields[2][1], price_per_hour=120)
