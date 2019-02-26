@@ -29,3 +29,13 @@ class NearGamesSerializer(serializers.Serializer):
 
 class UniqueNameSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=50)
+
+
+class UsernameSerializer(serializers.Serializer):
+    username = serializers.CharField()
+
+    def validate(self, data):
+        if not User.objects.filter(username=data['username']).exists():
+            raise serializers.ValidationError('Username does not exists')
+
+        return data

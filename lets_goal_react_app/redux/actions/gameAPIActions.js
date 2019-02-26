@@ -4,6 +4,7 @@ import {
   LIST_USERS_GAMES,
   LIST_NEAR_GAMES,
   LIST_NEAR_FIELDS,
+  FETCHING_USERS_GAMES,
   NEW_GAME_FORM_SUBIMT_SUCCESS,
   NEW_GAME_FORM_FAIL,
 } from './types';
@@ -62,6 +63,23 @@ export const fetchNearFields = ({ longitude, latitude }) => async (dispatch) => 
   } catch (e) {
     console.log(e);
   }
+};
 
-  // dispatch({ type: LIST_NEAR_FIELDS, payload: [field] });
+export const fetchUserGames = (username, token) => async (dispatch) => {
+  try {
+    dispatch({ type: FETCHING_USERS_GAMES });
+    const url = `${BASE_URL}games/get_users_games/?username=${username}`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      console.log(errorMsg);
+    }
+
+    const { users_games: usersGames } = await response.json();
+
+    dispatch({ type: LIST_USERS_GAMES, payload: usersGames });
+  } catch (e) {
+    console.log(e);
+  }
 };
