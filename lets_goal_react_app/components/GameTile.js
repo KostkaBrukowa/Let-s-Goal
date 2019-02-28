@@ -31,7 +31,7 @@ const GameTile = (props) => {
   const dateString = date.substring(0, 10).replace(/-/g, '.');
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.box} />
+      <TouchableOpacity style={styles.box} onPress={onPress} />
       <Text style={styles.street}>{street}</Text>
       <Text style={styles.date}>{dateString}</Text>
     </View>

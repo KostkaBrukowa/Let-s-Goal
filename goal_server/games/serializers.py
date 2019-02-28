@@ -5,7 +5,6 @@ from .models import Playing_Field, Game
 
 
 class PlayingFieldSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Playing_Field
         fields = ('__all__')

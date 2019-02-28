@@ -23,6 +23,7 @@ import PickFieldCallout from '../components/PickFieldCallout';
 import { ALMOST_WHITE_TINT, PURPLE_APP_TINT } from '../const/const';
 import GameTile from '../components/GameTile';
 import BackgroundImageScroll from '../components/BackGroundImageScroll';
+import { showGame } from '../redux/actions/appStateActions';
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -39,19 +40,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'white',
     margin: 5,
-  },
-  boxM: {
-    width: 130,
-    height: 130,
-    backgroundColor: 'black',
-    borderWidth: 1,
-    borderColor: 'white',
-    margin: 5,
-  },
-  boxN: {
-    width: 100,
-    height: 100,
-    backgroundColor: 'red',
   },
   title: {
     // width: '100%',
@@ -81,34 +69,52 @@ export class EventsScreen extends Component {
   static propTypes = {
     isFetchingGames: PropTypes.bool.isRequired,
     usersGames: PropTypes.array.isRequired,
+    usersFields: PropTypes.array.isRequired,
     fetchUserGames: PropTypes.func.isRequired,
+    showGame: PropTypes.func.isRequired,
   };
 
   componentDidMount = () => {
     const { fetchUserGames } = this.props;
-    fetchUserGames('Mark');
+    fetchUserGames('Alex');
   };
 
-  static propTypes = {};
+  goToGameDetails(game, field) {
+    const { showGame, navigation } = this.props;
+    showGame(game, field);
+    navigation.push('detailsScreen', { gameName: game.name });
+  }
 
   render() {
-    const { isFetchingGames, usersGames, fetchUserGames } = this.props;
+    const {
+      isFetchingGames, usersGames, usersFields, fetchUserGames,
+    } = this.props;
     // You haven't signed for any games yet. Click button below to add new one or go to Join
     // tab to join existing game.
+
+    const gameTiles = usersGames.map((game) => {
+      const field = usersFields.filter(f => f.id === game.playing_field)[0];
+      return (
+        <GameTile
+          key={game.id}
+          street={`ul. ${field.street}`}
+          date={game.date}
+          onPress={() => this.goToGameDetails(game, field)}
+        />
+      );
+    });
+    console.log(isFetchingGames);
 
     return (
       <BackgroundImageScroll
         containerStyle={{ height: '100%' }}
-        onRefresh={() => fetchUserGames('Mark')}
+        onRefresh={() => fetchUserGames('Alex')}
         isLoading={isFetchingGames}
       >
-        <View style={[{ paddingRight: '8%', paddingLeft: '8%' }, styles.container]}>
+        <View style={[{ paddingRight: '5%', paddingLeft: '5%' }, styles.container]}>
           <Text style={styles.title}>My events</Text>
           <ScrollView horizontal>
-            {usersGames.map(game => (
-              <GameTile street={game.street} date={game.date} onPress={() => {}} />
-            ))}
-
+            {gameTiles}
             <TouchableOpacity style={[styles.box, styles.addNewEventBox]}>
               <Text style={styles.textInBox}>Add new event</Text>
             </TouchableOpacity>
@@ -121,6 +127,7 @@ export class EventsScreen extends Component {
 
 const mapStateToProps = state => ({
   usersGames: state.gameAPI.usersGames,
+  usersFields: state.gameAPI.usersFields,
   isFetchingGames: state.gameAPI.isUsersGamesFetching,
 });
 
@@ -128,5 +135,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { fetchUserGames },
+  { fetchUserGames, showGame },
 )(EventsScreen);

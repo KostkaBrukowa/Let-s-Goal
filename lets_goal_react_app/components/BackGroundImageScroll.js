@@ -33,7 +33,7 @@ const BackgroundImageScroll = (props) => {
     <ScrollView
       style={styles.scrollStyle}
       contentContainerStyle={[styles.container, containerStyle]}
-      refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+      refreshControl={onRefresh && <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
     >
       <View style={{ width: '100%', height: '100%' }}>
         <ImageBackground

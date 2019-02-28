@@ -39,8 +39,9 @@ class GameViewSet(viewsets.ModelViewSet):
             return bad_request(serializer)
 
         user = User.objects.get(username=serializer.data['username'])
-        users_games = user.game_set.values()
-
+        users_games = user.game_set.prefetch_related('playing_field')
+        users_games = [{'game': GameSerializer(game).data, 'playing_field': PlayingFieldSerializer(game.playing_field).data}
+                       for game in users_games]
         return Response({'users_games': users_games}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])

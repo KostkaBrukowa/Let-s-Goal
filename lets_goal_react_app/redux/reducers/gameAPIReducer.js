@@ -19,7 +19,8 @@ function uniqueObjects(array, propertyName) {
 }
 export const apiDefaultState = {
   nearGames: [],
-  usersGames: new Set(),
+  usersGames: [],
+  usersFields: [],
   nearFields: [],
   // isNearGamesFetching: false,
   isUsersGamesFetching: false,
@@ -38,10 +39,14 @@ export default function (state = apiDefaultState, action) {
         isUsersGamesFetching: true,
       };
     case LIST_USERS_GAMES: {
-      const { usersGames } = state;
+      const { usersGames, usersFields } = state;
       return {
         ...state,
-        usersGames: uniqueObjects([...usersGames, ...action.payload], 'id'),
+        usersGames: uniqueObjects([...usersGames, ...action.payload.map(g => g.game)], 'id'),
+        usersFields: uniqueObjects(
+          [...usersFields, ...action.payload.map(g => g.playing_field)],
+          'id',
+        ),
         isUsersGamesFetching: false,
       };
     }
