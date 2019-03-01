@@ -103,7 +103,7 @@ export const fetchNearGames = ({ longitude, latitude }) => async (dispatch) => {
 
     const { near_games: nearGames } = await response.json();
 
-    dispatch({ type: LIST_FIELDS, payload: nearGames.map(g => g.playing_filed) });
+    dispatch({ type: LIST_FIELDS, payload: nearGames.map(g => g.playing_field) });
     dispatch({ type: LIST_NEAR_GAMES, payload: nearGames.map(g => g.game) });
   } catch (e) {
     console.log(e);

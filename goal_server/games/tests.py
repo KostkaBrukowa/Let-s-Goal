@@ -184,9 +184,11 @@ class GamesTests(APITestCase):
         response = self.client.get(
             '/games/get_near_games/', data=data)
 
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['near_games']), 1)
-        self.assertEqual(response.data['near_games'][0]['playing_field_id'], 2)
+        self.assertEqual(response.data['near_games']
+                         [0]['playing_field']['id'], 2)
 
 
 class PlayingFieldTests(APITestCase):

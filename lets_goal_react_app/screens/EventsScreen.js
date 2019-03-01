@@ -82,7 +82,7 @@ export class EventsScreen extends Component {
   goToGameDetails(game, field) {
     const { showGame, navigation } = this.props;
     showGame(game, field);
-    navigation.push('detailsScreen', { gameName: game.name });
+    navigation.navigate('detailsScreen', { gameName: game.name });
   }
 
   render() {

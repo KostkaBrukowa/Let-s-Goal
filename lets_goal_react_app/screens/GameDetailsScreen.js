@@ -78,7 +78,7 @@ const Title = ({ title }) => (
 function GameDetailsScreen(props) {
   const { width, height } = Dimensions.get('window');
   const {
-    name, street, date, players, maxPlayers, longitude, price, latitude,
+    owner, street, date, players, maxPlayers, longitude, price, latitude,
   } = props;
 
   const dateString = date.substring(0, 10).replace(/-/g, '.');
@@ -101,7 +101,7 @@ function GameDetailsScreen(props) {
         style={{ height: 0.53 * height, width, marginBottom: '3%' }}
         initialRegion={initialRegion}
       >
-        <Marker coordinate={{ longitude, latitude }} />
+        <Marker coordinate={{ longitude, latitude }} title={owner} />
       </MapView>
       <View style={[styles.container]}>
         <Title title="Players" />
@@ -132,6 +132,7 @@ function GameDetailsScreen(props) {
 GameDetailsScreen.propTypes = {
   name: PropTypes.string.isRequired,
   street: PropTypes.string.isRequired,
+  owner: PropTypes.string.isRequired,
   date: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   players: PropTypes.array.isRequired,
@@ -149,6 +150,7 @@ const mapStateToProps = state => ({
   name: state.appState.currentGameDetail.name,
   date: state.appState.currentGameDetail.date,
   street: state.appState.currentGameField.street,
+  owner: state.appState.currentGameField.owner,
   players: state.appState.currentGameDetail.players,
   maxPlayers: state.appState.currentGameDetail.players_number,
   price: state.appState.currentGameField.price_per_hour,
