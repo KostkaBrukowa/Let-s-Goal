@@ -5,7 +5,7 @@ import {
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { MapView } from 'expo';
-import { Marker, Callout } from 'react-native-maps';
+import { Marker } from 'react-native-maps';
 
 import BackgroundImageScroll from '../components/BackGroundImageScroll';
 import { PURPLE_APP_TINT } from '../const/const';
@@ -78,14 +78,12 @@ const Title = ({ title }) => (
 function GameDetailsScreen(props) {
   const { width, height } = Dimensions.get('window');
   const {
-    name, street, date, players, maxPlayers, longitude: lng, latitude: lat,
+    name, street, date, players, maxPlayers, longitude, price, latitude,
   } = props;
 
   const dateString = date.substring(0, 10).replace(/-/g, '.');
   const hourString = date.substring(11, 16);
 
-  const longitude = parseFloat(lng);
-  const latitude = parseFloat(lat);
   const initialRegion = {
     latitude,
     longitude,
@@ -93,7 +91,7 @@ function GameDetailsScreen(props) {
     longitudeDelta: 0.0421,
   };
 
-  const playersTiles = [...players, 2, 3, 4, 5, 6, 7, 8, 9].map(player => (
+  const playersTiles = [...players].map(player => (
     <Image key={player} source={require('../assets/images/no_image_player_icon.png')} />
   ));
 
@@ -118,7 +116,7 @@ function GameDetailsScreen(props) {
           leftText="Number of players: "
           rightText={`${players.length}/${maxPlayers}`}
         />
-        <DescriptionRow leftText="Price: " rightText={street} />
+        <DescriptionRow leftText="Price: " rightText={`${price} USD`} />
         <View style={styles.button}>
           <Button
             title="Join the game"
@@ -139,8 +137,8 @@ GameDetailsScreen.propTypes = {
   players: PropTypes.array.isRequired,
   maxPlayers: PropTypes.number.isRequired,
   price: PropTypes.number.isRequired,
-  longitude: PropTypes.string.isRequired,
-  latitude: PropTypes.string.isRequired,
+  longitude: PropTypes.number.isRequired,
+  latitude: PropTypes.number.isRequired,
 };
 
 GameDetailsScreen.navigationOptions = ({ navigation }) => ({

@@ -21,7 +21,7 @@ class GameSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 
-class NearGamesSerializer(serializers.Serializer):
+class LatLngSerializer(serializers.Serializer):
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6)
     latitude = serializers.DecimalField(max_digits=9, decimal_places=6)
 

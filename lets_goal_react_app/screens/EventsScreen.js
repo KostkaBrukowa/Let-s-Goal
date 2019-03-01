@@ -69,7 +69,7 @@ export class EventsScreen extends Component {
   static propTypes = {
     isFetchingGames: PropTypes.bool.isRequired,
     usersGames: PropTypes.array.isRequired,
-    usersFields: PropTypes.array.isRequired,
+    fields: PropTypes.array.isRequired,
     fetchUserGames: PropTypes.func.isRequired,
     showGame: PropTypes.func.isRequired,
   };
@@ -87,13 +87,13 @@ export class EventsScreen extends Component {
 
   render() {
     const {
-      isFetchingGames, usersGames, usersFields, fetchUserGames,
+      isFetchingGames, usersGames, fields, fetchUserGames,
     } = this.props;
     // You haven't signed for any games yet. Click button below to add new one or go to Join
     // tab to join existing game.
 
     const gameTiles = usersGames.map((game) => {
-      const field = usersFields.filter(f => f.id === game.playing_field)[0];
+      const field = fields.filter(f => f.id === game.playing_field)[0];
       return (
         <GameTile
           key={game.id}
@@ -103,7 +103,6 @@ export class EventsScreen extends Component {
         />
       );
     });
-    console.log(isFetchingGames);
 
     return (
       <BackgroundImageScroll
@@ -127,7 +126,7 @@ export class EventsScreen extends Component {
 
 const mapStateToProps = state => ({
   usersGames: state.gameAPI.usersGames,
-  usersFields: state.gameAPI.usersFields,
+  fields: state.gameAPI.fields,
   isFetchingGames: state.gameAPI.isUsersGamesFetching,
 });
 

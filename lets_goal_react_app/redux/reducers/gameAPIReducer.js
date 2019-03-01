@@ -4,8 +4,9 @@ import {
   NEW_GAME_FORM_SUBIMT_SUCCESS,
   LIST_USERS_GAMES,
   LIST_NEAR_GAMES,
-  LIST_NEAR_FIELDS,
+  LIST_FIELDS,
   FETCHING_USERS_GAMES,
+  FETCHING_NEAR_GAMES,
 } from '../actions/types';
 
 // const _uniqueObjects = (array, prop) => {
@@ -20,9 +21,8 @@ function uniqueObjects(array, propertyName) {
 export const apiDefaultState = {
   nearGames: [],
   usersGames: [],
-  usersFields: [],
-  nearFields: [],
-  // isNearGamesFetching: false,
+  fields: [],
+  isNearGamesFetching: false,
   isUsersGamesFetching: false,
 };
 
@@ -39,28 +39,37 @@ export default function (state = apiDefaultState, action) {
         isUsersGamesFetching: true,
       };
     case LIST_USERS_GAMES: {
-      const { usersGames, usersFields } = state;
+      const { usersGames } = state;
       return {
         ...state,
-        usersGames: uniqueObjects([...usersGames, ...action.payload.map(g => g.game)], 'id'),
-        usersFields: uniqueObjects(
-          [...usersFields, ...action.payload.map(g => g.playing_field)],
-          'id',
-        ),
+        usersGames: uniqueObjects([...usersGames, ...action.payload], 'id'),
         isUsersGamesFetching: false,
       };
     }
+    case FETCHING_NEAR_GAMES:
+      return {
+        ...state,
+        isNearGamesFetching: true,
+      };
     case LIST_NEAR_GAMES:
       return {
         ...state,
         nearGames: action.payload,
+        isNearGamesFetching: false,
       };
 
-    case LIST_NEAR_FIELDS:
+    case LIST_FIELDS: {
+      const { fields } = state;
+      const parsedFields = action.payload.map(field => ({
+        ...field,
+        longitude: parseFloat(field.longitude),
+        latitude: parseFloat(field.latitude),
+      }));
       return {
         ...state,
-        nearFields: action.payload,
+        fields: uniqueObjects([...fields, ...parsedFields], 'id'),
       };
+    }
     default:
       return state;
   }

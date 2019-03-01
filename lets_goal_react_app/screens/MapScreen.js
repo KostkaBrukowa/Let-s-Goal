@@ -73,7 +73,7 @@ class Map extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  fields: state.gameAPI.nearFields,
+  fields: state.gameAPI.fields,
   chosenField: state.gameForm.playingField.value,
 });
 

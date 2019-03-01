@@ -27,23 +27,32 @@ const styles = StyleSheet.create({
 });
 
 const GameTile = (props) => {
-  const { street, date, onPress } = props;
-  const dateString = date.substring(0, 10).replace(/-/g, '.');
+  const {
+    street, date, onPress, side, children,
+  } = props;
+  const dateString = date && date.substring(0, 10).replace(/-/g, '.');
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.box} onPress={onPress} />
-      <Text style={styles.street}>{street}</Text>
-      <Text style={styles.date}>{dateString}</Text>
+      <TouchableOpacity style={[styles.box, { width: side, height: side }]} onPress={onPress}>
+        {children}
+      </TouchableOpacity>
+      {street && <Text style={styles.street}>{street}</Text>}
+      {dateString && <Text style={styles.date}>{dateString}</Text>}
     </View>
   );
 };
 
 GameTile.propTypes = {
-  street: PropTypes.string.isRequired,
-  date: PropTypes.string.isRequired,
+  street: PropTypes.string,
+  date: PropTypes.string,
   onPress: PropTypes.func.isRequired,
+  side: PropTypes.number,
 };
 
-GameTile.defaultProps = {};
+GameTile.defaultProps = {
+  street: null,
+  date: null,
+  side: 130,
+};
 
 export default GameTile;

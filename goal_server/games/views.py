@@ -1,4 +1,4 @@
-from .serializers import GameSerializer, PlayingFieldSerializer, NearGamesSerializer, UniqueNameSerializer, UsernameSerializer
+from .serializers import GameSerializer, PlayingFieldSerializer, LatLngSerializer, UniqueNameSerializer, UsernameSerializer
 from .models import Game, Playing_Field
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -17,9 +17,14 @@ class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all()
     permission_classes = [AllowAny]
 
+    @staticmethod
+    def getGamesWithFields(gameQueryset):
+        return [{'game': GameSerializer(game).data, 'playing_field': PlayingFieldSerializer(game.playing_field).data}
+                       for game in gameQueryset]
+
     @action(detail=False, methods=['get'])
     def get_near_games(self, request):
-        serializer = NearGamesSerializer(data=request.query_params)
+        serializer = LatLngSerializer(data=request.query_params)
         if not serializer.is_valid():
             return bad_request(serializer)
 
@@ -28,9 +33,9 @@ class GameViewSet(viewsets.ModelViewSet):
         radius = 1  # converting kilometers to degrees
 
         near_games = (Game.objects.filter(playing_field__longitude__range=(lng-radius, lng+radius))
-                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius))).values()
+                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius))).prefetch_related('playing_field')
 
-        return Response({'near_games': near_games}, status=status.HTTP_200_OK)
+        return Response({'near_games': GameViewSet.getGamesWithFields(near_games)}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def get_users_games(self, request):
@@ -40,9 +45,7 @@ class GameViewSet(viewsets.ModelViewSet):
 
         user = User.objects.get(username=serializer.data['username'])
         users_games = user.game_set.prefetch_related('playing_field')
-        users_games = [{'game': GameSerializer(game).data, 'playing_field': PlayingFieldSerializer(game.playing_field).data}
-                       for game in users_games]
-        return Response({'users_games': users_games}, status=status.HTTP_200_OK)
+        return Response({'users_games': GameViewSet.getGamesWithFields(users_games)}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def is_name_unique(self, request):
@@ -120,7 +123,7 @@ class FieldsViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     @renderer_classes((JSONRenderer,))
     def get_near_fields(self, request):
-        serializer = NearGamesSerializer(data=request.query_params)
+        serializer = LatLngSerializer(data=request.query_params)
         if not serializer.is_valid():
             return Response(
                 serializer.errors,
