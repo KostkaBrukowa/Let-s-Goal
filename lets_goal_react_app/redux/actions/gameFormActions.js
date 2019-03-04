@@ -19,7 +19,6 @@ export const pickName = name => async (dispatch) => {
       dispatch({ type: PICK_NAME_FAIL, payload: 'Name cannot be blank' });
       return;
     }
-    console.log(`${BASE_URL}games/is_name_unique/?name=${name}`);
     const response = await fetch(`${BASE_URL}games/is_name_unique/?name=${name}`);
 
     if (!response.ok) {

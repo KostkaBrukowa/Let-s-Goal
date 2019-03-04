@@ -8,7 +8,7 @@ const initialState = {};
 
 // const navMiddleware = createReactNavigationReduxMiddleware('root', state => state.nav);
 
-const middleware = [thunk, logger];
+const middleware = [thunk]; // logger
 
 export const store = createStore(rootReducer, initialState, applyMiddleware(...middleware));
 

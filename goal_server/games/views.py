@@ -1,10 +1,15 @@
-from .serializers import GameSerializer, PlayingFieldSerializer, NearGamesSerializer, UniqueNameSerializer
+from .serializers import GameSerializer, PlayingFieldSerializer, LatLngSerializer, UniqueNameSerializer, UsernameSerializer
 from .models import Game, Playing_Field
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import JSONRenderer
+from django.contrib.auth.models import User
+
+
+def bad_request(serializer):
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GameViewSet(viewsets.ModelViewSet):
@@ -12,32 +17,41 @@ class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all()
     permission_classes = [AllowAny]
 
+    @staticmethod
+    def getGamesWithFields(gameQueryset):
+        return [{'game': GameSerializer(game).data, 'playing_field': PlayingFieldSerializer(game.playing_field).data}
+                       for game in gameQueryset]
+
     @action(detail=False, methods=['get'])
     def get_near_games(self, request):
-        serializer = NearGamesSerializer(data=request.query_params)
+        serializer = LatLngSerializer(data=request.query_params)
         if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return bad_request(serializer)
 
         lng, lat = float(serializer.data['longitude']), float(
             serializer.data['latitude'])
         radius = 1  # converting kilometers to degrees
 
         near_games = (Game.objects.filter(playing_field__longitude__range=(lng-radius, lng+radius))
-                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius))).values()
+                                  .filter(playing_field__latitude__range=(lat-radius, lat+radius))).prefetch_related('playing_field')
 
-        return Response({'near_games': near_games}, status=status.HTTP_200_OK)
+        return Response({'near_games': GameViewSet.getGamesWithFields(near_games)}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def get_users_games(self, request):
+        serializer = UsernameSerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return bad_request(serializer)
+
+        user = User.objects.get(username=serializer.data['username'])
+        users_games = user.game_set.prefetch_related('playing_field')
+        return Response({'users_games': GameViewSet.getGamesWithFields(users_games)}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def is_name_unique(self, request):
         serializer = UniqueNameSerializer(data=request.query_params)
         if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return bad_request(serializer)
 
         name = serializer.data['name']  # converting kilometers to degrees
 
@@ -70,7 +84,11 @@ class GameViewSet(viewsets.ModelViewSet):
         TODO: allow game owner to remove players
         TODO: allow admin to remove players
         '''
-        username = request.data['username']
+        serializer = UsernameSerializer(data=request.data)
+        if not serializer.is_valid():
+            return bad_request(serializer)
+
+        username = serializer.data['username']
         if username != request.user.username:
             return Response(
                 {'error': 'You cannot remove this player'},
@@ -105,7 +123,7 @@ class FieldsViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     @renderer_classes((JSONRenderer,))
     def get_near_fields(self, request):
-        serializer = NearGamesSerializer(data=request.query_params)
+        serializer = LatLngSerializer(data=request.query_params)
         if not serializer.is_valid():
             return Response(
                 serializer.errors,

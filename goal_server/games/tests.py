@@ -10,6 +10,22 @@ from django.contrib.auth.models import User
 
 # Create your tests here.
 
+def create_game(name, **kwargs):
+    date = kwargs.pop('date', timezone.now())
+    players_number = kwargs.pop('players_number', 5)
+    playing_field = kwargs.pop(
+        'playing_field',  Playing_Field.objects.get(pk=1))
+    players = kwargs.pop('players', [])
+
+    game = Game.objects.create(
+        name=name,
+        date=date,
+        players_number=players_number,
+        playing_field=playing_field,
+    )
+    game.players.set(players)
+    return game
+
 
 class GamesTests(APITestCase):
     def setUp(self):
@@ -29,12 +45,10 @@ class GamesTests(APITestCase):
         field3 = Playing_Field.objects.create(
             street=fields[2][2], owner='MOSIR', latitude=fields[2][0], longitude=fields[2][1], price_per_hour=120)
 
-        self.game1 = Game.objects.create(name='game1', date=timezone.now(),
-                                         players_number=1, playing_field=self.field1)
-        self.game2 = Game.objects.create(name='game2', date=timezone.now(),
-                                         players_number=4, playing_field=field2)
-        Game.objects.create(name='game3', date=timezone.now(),
-                            players_number=5, playing_field=field3)
+        self.game1 = create_game(
+            name='game1', players_number=1, playing_field=self.field1)
+        self.game2 = create_game(name='game2', playing_field=field2)
+        self.game3 = create_game(name='game3', playing_field=field3)
 
         self.client.login(username='Alex', password='password')
 
@@ -42,29 +56,26 @@ class GamesTests(APITestCase):
         """
         testing if simple get request with id works
         """
-        Game.objects.create(name='game4', date=timezone.now(),
-                            players_number=3, playing_field=Playing_Field.objects.get(pk=1))
+        create_game(name='game4')
 
         response = self.client.get('/games/4/')
 
         self.assertEqual(response.data['id'], 4)
         self.assertEqual(response.data['playing_field'], 1)
 
-    def test_post_game(self):
-        game = {
-            'name': 'test_name',
-            'date': timezone.now(),
-            'players_number': 2,
-            # 'players': [],
-            'playing_field': 1,
-        }
-        # self.client.login(username='Alex', password='password')
+    # UNCOMMENT WHEN AUTHENTICATION READY
+    # def test_post_game(self):
+    #     game = {
+    #         'name': 'test_name',
+    #         'date': timezone.now(),
+    #         'players_number': 2,
+    #         'playing_field': 1,
+    #     }
 
-        response = self.client.post('/games/', data=game, format='json')
+    #     response = self.client.post('/games/', data=game, format='json')
 
-        # print(dir(response))
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['players'], [1, ])
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     self.assertEqual(response.data['players'], [1, ])
 
     def test_update_game(self):
         '''
@@ -82,8 +93,7 @@ class GamesTests(APITestCase):
         '''
         testing adding a player when there is no available space
         '''
-        game = Game.objects.create(name='game4', date=timezone.now(),
-                                   players_number=1, playing_field=self.field1)
+        game = create_game(name='game4', players_number=1)
         game.players.add(User.objects.get(pk=3))
 
         response = self.client.patch('/games/4/add_player/', format='json')
@@ -153,19 +163,32 @@ class GamesTests(APITestCase):
             response.data['error'], 'You cannot remove this player'
         )
 
-    # def test_get_near_games(self):
-    #     """
-    #     testting viewset action to retrieve games from certain area
-    #     """
-    #     data = {'longitude':20, 'latitude': 20, 'radius_km':15}
-    #     url='/games/get_near_games?longitude=220&latitude=20&radius_km=15/'
+    def test_get_users_games(self):
+        user = User.objects.get(username="Alex")
+        create_game(name='game4', players=[user.pk])
+        create_game(name='game5', players=[user.pk])
+        create_game(name='game6', players=[])
 
-    #     response = self.client.get(url)
+        response = self.client.get(
+            '/games/get_users_games/', data={'username': 'Alex'})
 
-    #     print(response)
-    #     print(response.data)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(len(response.data['near_games']), 2)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['users_games']), 2)
+
+    def test_get_near_games(self):
+        """
+        testting viewset action to retrieve games from certain area
+        """
+        data = {'longitude': 20, 'latitude': 20}
+
+        response = self.client.get(
+            '/games/get_near_games/', data=data)
+
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['near_games']), 1)
+        self.assertEqual(response.data['near_games']
+                         [0]['playing_field']['id'], 2)
 
 
 class PlayingFieldTests(APITestCase):
