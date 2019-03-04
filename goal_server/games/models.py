@@ -20,3 +20,5 @@ class Game(models.Model):
         verbose_name='Number of players', name='players_number')
     players = models.ManyToManyField(User, blank=True)
     playing_field = models.ForeignKey(Playing_Field, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='owned_games', )

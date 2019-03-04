@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from django.contrib.auth.models import User
+from rest_framework import permissions
 
 
 def bad_request(serializer):
@@ -15,12 +16,12 @@ def bad_request(serializer):
 class GameViewSet(viewsets.ModelViewSet):
     serializer_class = GameSerializer
     queryset = Game.objects.all()
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.IsAuthenticated, ]
 
     @staticmethod
     def getGamesWithFields(gameQueryset):
         return [{'game': GameSerializer(game).data, 'playing_field': PlayingFieldSerializer(game.playing_field).data}
-                       for game in gameQueryset]
+                for game in gameQueryset]
 
     @action(detail=False, methods=['get'])
     def get_near_games(self, request):
@@ -88,14 +89,15 @@ class GameViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return bad_request(serializer)
 
+        game = self.get_object()
+
         username = serializer.data['username']
-        if username != request.user.username:
+        if username != request.user.username and username != game.owner.username:
             return Response(
                 {'error': 'You cannot remove this player'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        game = self.get_object()
         player = game.players.filter(username=username).first()
         if player is None:
             return Response(
@@ -109,8 +111,7 @@ class GameViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
-        serializer.save()
-        # serializer.save(players=[self.request.user]) UNCOMMENT WHEN AUTHENTICATION IS READY
+        serializer.save(players=[self.request.user], owner=self.request.user)
 
 
 class FieldsViewSet(viewsets.ReadOnlyModelViewSet):

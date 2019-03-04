@@ -23,6 +23,7 @@ export class JoinScreen extends Component {
 
     fetchNearGames: PropTypes.func.isRequired,
     showGame: PropTypes.func.isRequired,
+    isFetchingGames: PropTypes.bool.isRequired,
   };
 
   state = {

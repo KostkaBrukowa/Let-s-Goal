@@ -1,8 +1,10 @@
-import { LOG_IN_SUCCESS } from '../actions/types';
+import { LOG_IN_SUCCESS, LOG_IN_FAIL, AUTHENTICATING_USER } from '../actions/types';
 
 const defaultState = {
-  username: null,
-  isUserLogged: false,
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isBeingAutheticated: false,
 };
 
 export default function (state = defaultState, action) {
@@ -10,7 +12,23 @@ export default function (state = defaultState, action) {
     case LOG_IN_SUCCESS:
       return {
         ...state,
-        isUserLogged: true,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAuthenticated: true,
+        isBeingAutheticated: false,
+      };
+    case LOG_IN_FAIL:
+      return {
+        ...state,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAuthenticated: true,
+        isBeingAutheticated: false,
+      };
+    case AUTHENTICATING_USER:
+      return {
+        ...state,
+        isBeingAutheticated: true,
       };
     default:
       return state;

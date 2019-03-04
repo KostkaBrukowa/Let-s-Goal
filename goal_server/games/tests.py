@@ -16,12 +16,14 @@ def create_game(name, **kwargs):
     playing_field = kwargs.pop(
         'playing_field',  Playing_Field.objects.get(pk=1))
     players = kwargs.pop('players', [])
+    owner = kwargs.pop('owner', User.objects.get(pk=1))
 
     game = Game.objects.create(
         name=name,
         date=date,
         players_number=players_number,
         playing_field=playing_field,
+        owner=owner,
     )
     game.players.set(players)
     return game
@@ -51,6 +53,7 @@ class GamesTests(APITestCase):
         self.game3 = create_game(name='game3', playing_field=field3)
 
         self.client.login(username='Alex', password='password')
+        # self.client.force_authenticate(user=User.objects.get(pk=1))
 
     def test_get_game(self):
         """
@@ -64,18 +67,19 @@ class GamesTests(APITestCase):
         self.assertEqual(response.data['playing_field'], 1)
 
     # UNCOMMENT WHEN AUTHENTICATION READY
-    # def test_post_game(self):
-    #     game = {
-    #         'name': 'test_name',
-    #         'date': timezone.now(),
-    #         'players_number': 2,
-    #         'playing_field': 1,
-    #     }
+    def test_post_game(self):
+        game = {
+            'name': 'test_name',
+            'date': timezone.now(),
+            'players_number': 2,
+            'playing_field': 1,
+        }
 
-    #     response = self.client.post('/games/', data=game, format='json')
+        response = self.client.post('/games/', data=game, format='json')
 
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #     self.assertEqual(response.data['players'], [1, ])
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['owner'], 1)
+        self.assertEqual(response.data['players'], [1, ])
 
     def test_update_game(self):
         '''
@@ -184,7 +188,6 @@ class GamesTests(APITestCase):
         response = self.client.get(
             '/games/get_near_games/', data=data)
 
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['near_games']), 1)
         self.assertEqual(response.data['near_games']
@@ -204,6 +207,7 @@ class PlayingFieldTests(APITestCase):
         )
         response = self.client.get('/fields/1/')
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], 1)
 
     def test_list_fields(self):
@@ -219,4 +223,5 @@ class PlayingFieldTests(APITestCase):
 
         response = self.client.get('/fields/')
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)

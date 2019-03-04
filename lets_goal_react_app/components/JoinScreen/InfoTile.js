@@ -51,6 +51,7 @@ export default class InfoTile extends Component {
       currentPlayers,
       maxPlayers,
       onButtonPress,
+      visible,
     } = this.props;
     const { animatedValue } = this.state;
     return (
@@ -67,7 +68,12 @@ export default class InfoTile extends Component {
         <Info text={`${currentPlayers}/${maxPlayers}`} />
         <Info text={`Price: ${price} USD`} />
         <View style={{ width: 80 }}>
-          <Button title="Join" color={PURPLE_APP_TINT} onPress={onButtonPress} />
+          <Button
+            disabled={!visible}
+            title="Join"
+            color={PURPLE_APP_TINT}
+            onPress={onButtonPress}
+          />
         </View>
       </Animated.View>
     );

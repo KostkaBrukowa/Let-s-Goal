@@ -71,6 +71,7 @@ export const fetchUserGames = (username, token) => async (dispatch) => {
     dispatch({ type: FETCHING_USERS_GAMES });
     const url = `${BASE_URL}games/get_users_games/?username=${username}`;
 
+    console.log('fetched')
     const response = await fetch(url);
     if (!response.ok) {
       const errorMsg = await response.text();
