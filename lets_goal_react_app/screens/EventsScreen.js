@@ -16,7 +16,6 @@ import PropTypes from 'prop-types';
 import { Constants } from 'expo';
 import { Set } from 'immutable';
 
-import { login } from '../redux/actions/auth';
 import { fetchUserGames } from '../redux/actions/gameAPIActions';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
 import PickFieldCallout from '../components/PickFieldCallout';

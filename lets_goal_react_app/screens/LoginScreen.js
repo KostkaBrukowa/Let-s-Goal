@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import {
+  Alert,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
   KeyboardAvoidingView,
   View,
   Text,
@@ -14,21 +17,12 @@ import { connect } from 'react-redux';
 
 import { PURPLE_APP_TINT } from '../const/const';
 import appStyle from '../const/globalStyles';
-import BackgroundImageScroll from '../components/BackGroundImageScroll';
+import BackgroundImage from '../components/BackgroundImage';
 import CustomButton from '../components/CustomButton';
+import { login } from '../redux/actions/authActions';
+import FormTextInput from '../components/login/FormTextInput';
 
 const styles = StyleSheet.create({
-  input: {
-    color: 'white',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    width: 300,
-    height: 55,
-    fontSize: 20,
-    borderRadius: 5,
-    padding: 4,
-    marginTop: 26,
-  },
-
   button: {
     width: 300,
     height: 50,
@@ -40,61 +34,127 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: 'white',
   },
+  description: {
+    fontSize: 17,
+    color: 'lightgrey',
+    textAlign: 'center',
+  },
+  textLink: {
+    fontSize: 20,
+    textDecorationLine: 'underline',
+    color: 'white',
+  },
 });
 
-export class LoginScreen extends Component {
+class LoginScreen extends Component {
   static navigationOptions = {
     header: null,
   };
 
   static propTypes = {
-    authenticate: PropTypes.func.isRequired,
+    login: PropTypes.func.isRequired,
+    loginFailed: PropTypes.bool.isRequired,
+    isBeingAuthenticated: PropTypes.bool.isRequired,
+    isAuthenticated: PropTypes.bool.isRequired,
   };
 
   state = {
-    login: '',
+    username: '',
     password: '',
+    usernameError: '',
+    passwordError: '',
   };
 
+  componentDidUpdate = (prevProps) => {
+    const { isBeingAuthenticated } = this.props;
+    const { isBeingAuthenticated: prevIsBeingAuthenticated } = prevProps;
+    if (isBeingAuthenticated !== prevIsBeingAuthenticated && !isBeingAuthenticated) {
+      const { loginFailed } = this.props;
+      if (loginFailed) {
+        this.makeAlert(
+          'Wrong credentials',
+          'You gave us wrong username or password. Please try again',
+        );
+      }
+    }
+  };
+
+  logUserIn = (username, password) => {
+    if (username === '') {
+      this.setState({ usernameError: 'Login cannot be blank' });
+      return;
+    }
+    if (password === '') {
+      this.setState({ passwordError: 'Password cannot be blank' });
+      return;
+    }
+
+    const { login } = this.props;
+    login(username, password);
+  };
+
+  makeAlert = (title, message) => {
+    Alert.alert(
+      title,
+      message,
+      [{ text: 'Ok', onPress: () => {} }],
+      // { cancelable: false },
+    );
+  };
+
+
   render() {
-    const { login, password } = this.state;
+    const {
+      username, password, usernameError, passwordError,
+    } = this.state;
+    const { navigation } = this.props;
     const { height } = Dimensions.get('screen');
+
     return (
-      <ImageBackground
-        style={[appStyle.container, { height }]}
-        imageStyle={[appStyle.backgroundAbsoluteStyle]}
-        source={require('../assets/images/background-field.jpg')}
-      >
+      <BackgroundImage>
         <KeyboardAvoidingView style={[appStyle.container]} behavior="padding" enabled>
           <Text style={appStyle.bigTitle}>Log in</Text>
-          <TextInput
-            style={styles.input}
-            onChange={login => this.setState({ login })}
-            value={login}
+          <FormTextInput
+            onChangeText={username => this.setState({ username, usernameError: '' })}
+            value={username}
             placeholder="Username"
+            error={usernameError}
           />
-          <TextInput
-            style={styles.input}
-            onChange={password => this.setState({ password })}
+          <FormTextInput
+            onChangeText={password => this.setState({ password, passwordError: '' })}
             value={password}
             placeholder="Password"
+            error={passwordError}
           />
           <CustomButton
             style={styles.button}
             textStyle={styles.buttonTitle}
-            onPress={() => console.log('logged')}
+            onPress={() => this.logUserIn(username, password)}
             title="Log in"
             color={PURPLE_APP_TINT}
           />
+
+          <View style={[{ margin: 20 }, appStyle.container]}>
+            <Text style={styles.description}>Do not have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('register')}>
+              <Text style={styles.textLink}>Create one now</Text>
+            </TouchableOpacity>
+          </View>
         </KeyboardAvoidingView>
-      </ImageBackground>
+      </BackgroundImage>
     );
   }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  loginFailed: state.user.loginFailed,
+  isBeingAuthenticated: state.user.isBeingAuthenticated,
+  isAuthenticated: state.user.isAuthenticated,
+});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  login,
+};
 
 export default connect(
   mapStateToProps,

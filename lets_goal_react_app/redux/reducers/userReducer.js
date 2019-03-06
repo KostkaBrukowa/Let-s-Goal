@@ -4,7 +4,8 @@ const defaultState = {
   user: null,
   token: null,
   isAuthenticated: false,
-  isBeingAutheticated: false,
+  isBeingAuthenticated: false,
+  loginFailed: false,
 };
 
 export default function (state = defaultState, action) {
@@ -15,20 +16,20 @@ export default function (state = defaultState, action) {
         user: action.payload.user,
         token: action.payload.token,
         isAuthenticated: true,
-        isBeingAutheticated: false,
+        isBeingAuthenticated: false,
+        loginFailed: false,
       };
     case LOG_IN_FAIL:
       return {
         ...state,
-        user: action.payload.user,
-        token: action.payload.token,
-        isAuthenticated: true,
-        isBeingAutheticated: false,
+        isAuthenticated: false,
+        isBeingAuthenticated: false,
+        loginFailed: true,
       };
     case AUTHENTICATING_USER:
       return {
         ...state,
-        isBeingAutheticated: true,
+        isBeingAuthenticated: true,
       };
     default:
       return state;

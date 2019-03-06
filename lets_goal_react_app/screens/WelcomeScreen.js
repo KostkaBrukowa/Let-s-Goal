@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import { PURPLE_APP_TINT, FACEBOOK_COLOR } from '../const/const';
 import appStyle from '../const/globalStyles';
 import CustomButton from '../components/CustomButton';
+import BackgroundImage from '../components/BackgroundImage';
 
 const styles = StyleSheet.create({
   container: {
@@ -22,17 +23,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 23,
-    color: 'white',
-  },
-  description: {
-    fontSize: 17,
-    color: 'grey',
-    textAlign: 'center',
-  },
-  textLink: {
-    fontSize: 17,
-    textDecorationLine: 'underline',
+    fontSize: 40,
     color: 'white',
   },
   button: {
@@ -47,6 +38,11 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: 'white',
   },
+  description: {
+    fontSize: 17,
+    color: 'white',
+    textAlign: 'center',
+  },
 });
 class WelcomeScreen extends Component {
   static navigationOptions = {
@@ -55,21 +51,15 @@ class WelcomeScreen extends Component {
 
   static propTypes = {};
 
-  state = {};
-
   render() {
     const { height } = Dimensions.get('screen');
     console.log(FACEBOOK_COLOR);
 
     return (
       <View style={{ marginTop: Constants.statusBarHeight }}>
-        <ImageBackground
-          style={[styles.container, { height: 1000 }]}
-          imageStyle={[appStyle.backgroundAbsoluteStyle]}
-          source={require('../assets/images/background-field-dim.png')}
-        >
+        <BackgroundImage>
           <Text style={[styles.title]}>Hello</Text>
-          <Text style={[styles.description, { marginBottom: 30 }]}>
+          <Text style={[styles.description, { marginBottom: 30, marginLeft: 47, marginRight: 47 }]}>
             If you want to play football today you are in a right place
           </Text>
 
@@ -92,14 +82,7 @@ class WelcomeScreen extends Component {
             title="Login with Facebook"
             onPress={() => this.props.navigation.push('register')}
           />
-
-          <View style={{ flexDirection: 'row', marginBottom: 20 }}>
-            <Text style={styles.description}>Do not have an account?</Text>
-            <TouchableWithoutFeedback style={{ marginLeft: 40 }}>
-              <Text style={styles.textLink}> Create one now</Text>
-            </TouchableWithoutFeedback>
-          </View>
-        </ImageBackground>
+        </BackgroundImage>
       </View>
     );
   }
