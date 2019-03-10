@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  View, TextInput, StyleSheet, Text, Animated,
+  View, TextInput, StyleSheet, Text, Animated, ScrollView,
 } from 'react-native';
 import { ERROR_COLOR } from '../../const/const';
 
@@ -42,7 +42,7 @@ class FormTextInput extends React.Component {
       if (error !== '') {
         Animated.timing(animatedValue, {
           duration: 450,
-          toValue: 20,
+          toValue: 24,
           // useNativeDriver: true,
         }).start();
       } else {
@@ -61,7 +61,9 @@ class FormTextInput extends React.Component {
     return (
       <View>
         <TextInput {...this.props} style={[styles.input, style, error && styles.errorInput]} />
-        <AnimatedText style={[styles.errorText, { height: animatedValue }]}>{error}</AnimatedText>
+        <ScrollView style={{ height: animatedValue }} horizontal>
+          <AnimatedText style={[styles.errorText, { height: animatedValue }]}>{error}</AnimatedText>
+        </ScrollView>
       </View>
     );
   }

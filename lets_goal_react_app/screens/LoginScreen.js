@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
   Alert,
   TouchableOpacity,
-  TouchableWithoutFeedback,
+  ActivityIndicator,
   KeyboardAvoidingView,
   View,
   Text,
@@ -53,9 +53,10 @@ class LoginScreen extends Component {
 
   static propTypes = {
     login: PropTypes.func.isRequired,
-    loginFailed: PropTypes.bool.isRequired,
+    loginErrors: PropTypes.object.isRequired,
     isBeingAuthenticated: PropTypes.bool.isRequired,
     isAuthenticated: PropTypes.bool.isRequired,
+    navigation: PropTypes.object.isRequired,
   };
 
   state = {
@@ -66,49 +67,49 @@ class LoginScreen extends Component {
   };
 
   componentDidUpdate = (prevProps) => {
+    // checking for end of authentication process
     const { isBeingAuthenticated } = this.props;
     const { isBeingAuthenticated: prevIsBeingAuthenticated } = prevProps;
     if (isBeingAuthenticated !== prevIsBeingAuthenticated && !isBeingAuthenticated) {
-      const { loginFailed } = this.props;
-      if (loginFailed) {
-        this.makeAlert(
-          'Wrong credentials',
-          'You gave us wrong username or password. Please try again',
-        );
+      const { loginErrors } = this.props;
+      const { isAuthenticated } = this.props;
+      if (loginErrors) {
+        this.makeAlert('Ups... Something went wrong', loginErrors.error);
+      } else if (isAuthenticated) {
+        const { navigation } = this.props;
+        navigation.navigate('mainApp');
       }
     }
+
+    // checking if authentication was successful
+    // const { isAuthenticated: prevIsAuthenticated } = prevProps;
+    // if (isAuthenticated) {
+    //   const { navigation } = this.props;
+    //   navigation.navigate('mainApp');
+    // }
   };
 
   logUserIn = (username, password) => {
-    if (username === '') {
-      this.setState({ usernameError: 'Login cannot be blank' });
-      return;
-    }
-    if (password === '') {
-      this.setState({ passwordError: 'Password cannot be blank' });
-      return;
-    }
+    // if (username === '' || password === '') {
+    //   if (password === '') this.setState({ passwordError: 'Password cannot be blank' });
+    //   if (username === '') this.setState({ usernameError: 'Login cannot be blank' });
+
+    //   return;
+    // }
 
     const { login } = this.props;
     login(username, password);
   };
 
   makeAlert = (title, message) => {
-    Alert.alert(
-      title,
-      message,
-      [{ text: 'Ok', onPress: () => {} }],
-      // { cancelable: false },
-    );
+    Alert.alert(title, message, [{ text: 'Ok' }]);
   };
-
 
   render() {
     const {
       username, password, usernameError, passwordError,
     } = this.state;
-    const { navigation } = this.props;
-    const { height } = Dimensions.get('screen');
+    const { navigation, isBeingAuthenticated } = this.props;
 
     return (
       <BackgroundImage>
@@ -125,14 +126,19 @@ class LoginScreen extends Component {
             value={password}
             placeholder="Password"
             error={passwordError}
+            secureTextEntry
           />
-          <CustomButton
-            style={styles.button}
-            textStyle={styles.buttonTitle}
-            onPress={() => this.logUserIn(username, password)}
-            title="Log in"
-            color={PURPLE_APP_TINT}
-          />
+          {!isBeingAuthenticated ? (
+            <CustomButton
+              style={styles.button}
+              textStyle={styles.buttonTitle}
+              onPress={() => this.logUserIn(username, password)}
+              title="Log in"
+              color={PURPLE_APP_TINT}
+            />
+          ) : (
+            <ActivityIndicator size={46} style={{ marginTop: 30 }} color={PURPLE_APP_TINT} />
+          )}
 
           <View style={[{ margin: 20 }, appStyle.container]}>
             <Text style={styles.description}>Do not have an account?</Text>
@@ -147,7 +153,7 @@ class LoginScreen extends Component {
 }
 
 const mapStateToProps = state => ({
-  loginFailed: state.user.loginFailed,
+  loginErrors: state.user.loginErrors,
   isBeingAuthenticated: state.user.isBeingAuthenticated,
   isAuthenticated: state.user.isAuthenticated,
 });

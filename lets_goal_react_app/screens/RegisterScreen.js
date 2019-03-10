@@ -2,19 +2,21 @@ import React, { Component } from 'react';
 import {
   View,
   Text,
-  TextInput,
+  ActivityIndicator,
   Button,
-  ImageBackground,
   Dimensions,
   StyleSheet,
+  KeyboardAvoidingView,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { PURPLE_APP_TINT } from '../const/const';
+import { PURPLE_APP_TINT, ERROR_COLOR } from '../const/const';
 import appStyle from '../const/globalStyles';
-import BackgroundImageScroll from '../components/BackGroundImageScroll';
+import BackgroundImage from '../components/BackgroundImage';
 import CustomButton from '../components/CustomButton';
+import FormTextInput from '../components/login/FormTextInput';
+import { register } from '../redux/actions/authActions';
 
 const styles = StyleSheet.create({
   input: {
@@ -31,6 +33,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 50,
     borderRadius: 5,
+    marginTop: 26,
   },
 
   buttonTitle: {
@@ -45,60 +48,135 @@ export class LoginScreen extends Component {
   };
 
   static propTypes = {
-    authenticate: PropTypes.func.isRequired,
+    register: PropTypes.func.isRequired,
+    isBeingAuthenticated: PropTypes.bool.isRequired,
+    registerErrors: PropTypes.object.isRequired,
   };
 
   state = {
-    login: '',
-    password: '',
-    repeatedPassword: '',
+    username: '',
+    email: '',
+    password1: '',
+    password2: '',
+    usernameError: '',
+    emailError: '',
+    mainError: '',
+  };
+
+  componentDidUpdate = (prevProps, prevState) => {
+    const { registerErrors } = this.props;
+    const { registerErrors: prevRegisterErrors } = prevProps;
+    if (registerErrors !== prevRegisterErrors) {
+      this.parseErrors();
+    }
+  };
+
+  parseErrors = () => {
+    const { registerErrors } = this.props;
+    console.log(registerErrors.username);
+
+    const newErrors = Object.keys(registerErrors).reduce((pValue, key) => {
+      console.log(key);
+      if (key !== 'non_field_errors') {
+        return { ...pValue, [`${key}Error`]: registerErrors[key][0] };
+      }
+      return { ...pValue, mainError: registerErrors.non_field_errors[0] };
+    }, {});
+    this.setState(newErrors);
+  };
+
+  handleInputChange = (field, input) => {
+    this.setState({
+      [field]: input,
+      [`${field}Error`]: '',
+    });
+  };
+
+  registerUser = (credentials) => {
+    const { password1, password2 } = credentials;
+    if (password1 !== password2) {
+      this.setState({ mainError: "Passwords didn't match" });
+      return;
+    }
+
+    const { register } = this.props;
+    register(credentials);
   };
 
   render() {
-    const { login, password, repeatedPassword } = this.state;
-    const { height } = Dimensions.get('screen');
+    const {
+      username,
+      email,
+      password1,
+      password2,
+      usernameError,
+      emailError,
+      mainError,
+    } = this.state;
+    const { isBeingAuthenticated } = this.props;
     return (
-      <ImageBackground
-        style={[appStyle.container, { height }]}
-        imageStyle={[appStyle.backgroundAbsoluteStyle]}
-        source={require('../assets/images/background-field.jpg')}
-      >
-        <View style={[{ height: 300 }, appStyle.container, { justifyContent: 'space-around' }]}>
+      <BackgroundImage>
+        <KeyboardAvoidingView style={[appStyle.container]} behavior="padding" enabled>
           <Text style={appStyle.bigTitle}>Register</Text>
-          <TextInput
-            style={styles.input}
-            onChange={login => this.setState({ login })}
-            value={login}
-            placeholder="Username"
+          {mainError !== '' && (
+            <Text style={[appStyle.bigTitle, { color: ERROR_COLOR }]}>{mainError}</Text>
+          )}
+          <FormTextInput
+            onChangeText={username => this.handleInputChange('username', username)}
+            value={username}
+            placeholder="username"
+            error={usernameError}
           />
-          <TextInput
-            style={styles.input}
-            onChange={password => this.setState({ password })}
-            value={password}
+          <FormTextInput
+            onChangeText={email => this.handleInputChange('email', email)}
+            value={email}
+            placeholder="email"
+            error={emailError}
+            keyboardType="email-address"
+          />
+          <FormTextInput
+            onChangeText={password1 => this.setState({ password1 })}
+            value={password1}
             placeholder="Password"
+            secureTextEntry
           />
-          <TextInput
-            style={styles.input}
-            onChange={repeatedPassword => this.setState({ repeatedPassword })}
-            value={repeatedPassword}
+          <FormTextInput
+            onChangeText={password2 => this.setState({ password2 })}
+            value={password2}
             placeholder="Repeat password"
+            secureTextEntry
           />
-          <CustomButton
-            style={styles.button}
-            textStyle={styles.buttonTitle}
-            onPress={() => console.log('logged')}
-            title="Register"
-            color={PURPLE_APP_TINT}
-          />
-        </View>
-      </ImageBackground>
+          {!isBeingAuthenticated ? (
+            <CustomButton
+              style={styles.button}
+              textStyle={styles.buttonTitle}
+              onPress={() => this.registerUser({
+                username,
+                password1,
+                password2,
+                email,
+              })
+              }
+              title="Log in"
+              color={PURPLE_APP_TINT}
+            />
+          ) : (
+            <ActivityIndicator size={46} color={PURPLE_APP_TINT} />
+          )}
+        </KeyboardAvoidingView>
+      </BackgroundImage>
     );
   }
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  isBeingAuthenticated: state.user.isBeingAuthenticated,
+  registerErrors: state.user.registerErrors,
+});
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+  register,
+};
 
 export default connect(
   mapStateToProps,
