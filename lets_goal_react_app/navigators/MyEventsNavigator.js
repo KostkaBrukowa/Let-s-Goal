@@ -1,17 +1,16 @@
-import React from 'react';
-import { Text } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 
-import MapScreen from '../screens/MapScreen';
 import EventsScreen from '../screens/EventsScreen';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
 import { PURPLE_APP_TINT } from '../const/const';
 import GameDetailsScreen from '../screens/GameDetailsScreen';
+import UserDetailsScreen from '../screens/UserDetailsScreen';
 
 const EventsNavigator = createStackNavigator(
   {
     eventsScreen: EventsScreen,
     detailsScreen: GameDetailsScreen,
+    userDetails: UserDetailsScreen,
   },
   {
     initialRouteName: 'eventsScreen',

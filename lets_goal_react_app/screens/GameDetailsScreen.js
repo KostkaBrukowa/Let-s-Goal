@@ -1,6 +1,13 @@
 import React from 'react';
 import {
-  Image, StyleSheet, View, Text, Dimensions, ScrollView, Button,
+  Image,
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  ScrollView,
+  Button,
+  TouchableOpacity,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -9,6 +16,9 @@ import { Marker } from 'react-native-maps';
 
 import BackgroundImageScroll from '../components/BackGroundImageScroll';
 import { PURPLE_APP_TINT } from '../const/const';
+import DescriptionRow from '../components/gameDetails/DescriptionRow';
+import Title from '../components/gameDetails/Title';
+import PlayerImageTile from '../components/gameDetails/PlayerImageTile';
 
 const styles = StyleSheet.create({
   test: {
@@ -20,65 +30,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  titleContainer: {
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 18,
-    color: 'white',
-    textAlign: 'center',
-  },
-  descriptionContainer: {
-    flexDirection: 'row',
-    width: '90%',
-    padding: '1%',
-  },
-  descriptionText: {
-    fontSize: 16,
-  },
-  leftDescriptionContainer: {
-    justifyContent: 'flex-start',
-    flex: 1,
-  },
-  leftDescriptionText: {
-    color: 'grey',
-    textAlign: 'left',
-  },
-  rightDescriptionContainer: {
-    justifyContent: 'flex-end',
-    flex: 1,
-  },
-  rightDescriptionText: {
-    color: 'white',
-    textAlign: 'right',
-  },
   button: {
     width: '70%',
     padding: '4%',
   },
 });
 
-const DescriptionRow = ({ leftText, rightText }) => (
-  <View style={[styles.descriptionContainer]}>
-    <View style={[styles.leftDescriptionContainer]}>
-      <Text style={[styles.descriptionText, styles.leftDescriptionText]}>{leftText}</Text>
-    </View>
-    <View style={[styles.rightDescriptionContainer]}>
-      <Text style={[styles.descriptionText, styles.rightDescriptionText]}>{rightText}</Text>
-    </View>
-  </View>
-);
-
-const Title = ({ title }) => (
-  <View style={[styles.titleContainer]}>
-    <Text style={styles.title}>{title}</Text>
-  </View>
-);
+function goToUserDetails(userId) {}
 
 function GameDetailsScreen(props) {
   const { width, height } = Dimensions.get('window');
   const {
-    owner, street, date, players, maxPlayers, longitude, price, latitude,
+    owner, street, date, players, maxPlayers, longitude, price, latitude, game,
   } = props;
 
   const dateString = date.substring(0, 10).replace(/-/g, '.');
@@ -92,7 +55,7 @@ function GameDetailsScreen(props) {
   };
 
   const playersTiles = [...players].map(player => (
-    <Image key={player} source={require('../assets/images/no_image_player_icon.png')} />
+    <PlayerImageTile playerId={player} key={player} />
   ));
 
   return (
@@ -147,6 +110,7 @@ GameDetailsScreen.navigationOptions = ({ navigation }) => ({
 });
 
 const mapStateToProps = state => ({
+  game: state.appState.currentGameDetail,
   name: state.appState.currentGameDetail.name,
   date: state.appState.currentGameDetail.date,
   street: state.appState.currentGameField.street,

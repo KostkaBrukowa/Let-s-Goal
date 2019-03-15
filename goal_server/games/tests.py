@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from django.utils import timezone
 
-
 from .models import Game, Playing_Field
 from django.contrib.auth.models import User
 
@@ -34,7 +33,7 @@ class GamesTests(APITestCase):
         User.objects.create_user('Alex', 'alex@gmail.com', 'password')
         User.objects.create_user('Mark', 'floy1980@hotmail.com', 'password')
         User.objects.create_user('Henry', 'fannie1994@gmail.com', 'password')
-        User.objects.create_user('Mike', 'rosella1991@hotmail.com', 'password')
+        # User.objects.create_user('Mike', 'rosella1991@hotmail.com', 'password')
 
         fields = [(10, 10, 'Koszykowa'),
                   (20, 20, 'Wilcza'),
@@ -44,26 +43,26 @@ class GamesTests(APITestCase):
             street=fields[0][2], owner='MOSIR', latitude=fields[0][0], longitude=fields[0][1], price_per_hour=100)
         field2 = Playing_Field.objects.create(
             street=fields[1][2], owner='MOSIR', latitude=fields[1][0], longitude=fields[1][1], price_per_hour=110)
-        field3 = Playing_Field.objects.create(
-            street=fields[2][2], owner='MOSIR', latitude=fields[2][0], longitude=fields[2][1], price_per_hour=120)
+        # field3 = Playing_Field.objects.create(
+        #     street=fields[2][2], owner='MOSIR', latitude=fields[2][0], longitude=fields[2][1], price_per_hour=120)
 
         self.game1 = create_game(
             name='game1', players_number=1, playing_field=self.field1)
-        self.game2 = create_game(name='game2', playing_field=field2)
-        self.game3 = create_game(name='game3', playing_field=field3)
+        self.game2 = create_game(
+            name='game2', playing_field=field2, owner=User.objects.get(pk=2))
 
         self.client.login(username='Alex', password='password')
-        # self.client.force_authenticate(user=User.objects.get(pk=1))
+        self.client.force_authenticate(user=User.objects.get(pk=1))
 
     def test_get_game(self):
         """
         testing if simple get request with id works
         """
-        create_game(name='game4')
+        create_game(name='game3')
 
-        response = self.client.get('/games/4/')
+        response = self.client.get('/games/3/')
 
-        self.assertEqual(response.data['id'], 4)
+        self.assertEqual(response.data['id'], 3)
         self.assertEqual(response.data['playing_field'], 1)
 
     # UNCOMMENT WHEN AUTHENTICATION READY
@@ -85,7 +84,7 @@ class GamesTests(APITestCase):
         '''
         testing simple addition of player to a game
         '''
-        response = self.client.patch('/games/1/add_player/', format='json')
+        response = self.client.put('/games/1/join_game/', format='json')
 
         game = Game.objects.get(pk=1)
 
@@ -97,10 +96,10 @@ class GamesTests(APITestCase):
         '''
         testing adding a player when there is no available space
         '''
-        game = create_game(name='game4', players_number=1)
+        game = create_game(name='game3', players_number=1)
         game.players.add(User.objects.get(pk=3))
 
-        response = self.client.patch('/games/4/add_player/', format='json')
+        response = self.client.put('/games/3/join_game/', format='json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -113,7 +112,7 @@ class GamesTests(APITestCase):
         '''
         self.game2.players.add(User.objects.get(pk=1))
 
-        response = self.client.patch('/games/2/add_player/', format='json')
+        response = self.client.put('/games/2/join_game/', format='json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -126,7 +125,7 @@ class GamesTests(APITestCase):
         '''
         self.game2.players.add(User.objects.get(pk=1))
 
-        response = self.client.patch(
+        response = self.client.put(
             '/games/2/remove_player/',
             data={'username': 'Alex'},
             format='json'
@@ -141,7 +140,7 @@ class GamesTests(APITestCase):
         is not signed to a game
         '''
 
-        response = self.client.patch(
+        response = self.client.put(
             '/games/2/remove_player/',
             data={'username': 'Alex'},
             format='json'
@@ -156,7 +155,7 @@ class GamesTests(APITestCase):
         '''
         testing removing other player that one that's logged in
         '''
-        response = self.client.patch(
+        response = self.client.put(
             '/games/2/remove_player/',
             data={'username': 'Henry'},
             format='json'

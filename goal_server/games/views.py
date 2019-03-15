@@ -2,15 +2,11 @@ from .serializers import GameSerializer, PlayingFieldSerializer, LatLngSerialize
 from .models import Game, Playing_Field
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import action, renderer_classes
 from rest_framework.renderers import JSONRenderer
 from django.contrib.auth.models import User
 from rest_framework import permissions
-
-
-def bad_request(serializer):
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GameViewSet(viewsets.ModelViewSet):
@@ -26,8 +22,7 @@ class GameViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def get_near_games(self, request):
         serializer = LatLngSerializer(data=request.query_params)
-        if not serializer.is_valid():
-            return bad_request(serializer)
+        serializer.is_valid(raise_exception=True)
 
         lng, lat = float(serializer.data['longitude']), float(
             serializer.data['latitude'])
@@ -41,8 +36,7 @@ class GameViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def get_users_games(self, request):
         serializer = UsernameSerializer(data=request.query_params)
-        if not serializer.is_valid():
-            return bad_request(serializer)
+        serializer.is_valid(raise_exception=True)
 
         user = User.objects.get(username=serializer.data['username'])
         users_games = user.game_set.prefetch_related('playing_field')
@@ -51,8 +45,7 @@ class GameViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def is_name_unique(self, request):
         serializer = UniqueNameSerializer(data=request.query_params)
-        if not serializer.is_valid():
-            return bad_request(serializer)
+        serializer.is_valid(raise_exception=True)
 
         name = serializer.data['name']  # converting kilometers to degrees
 
@@ -60,8 +53,8 @@ class GameViewSet(viewsets.ModelViewSet):
 
         return Response({'exists': exists}, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['patch'])
-    def add_player(self, request, pk=None):
+    @action(detail=True, methods=['put'])
+    def join_game(self, request, pk=None):
         game = self.get_object()
         if game.players.count() >= game.players_number:
             return Response({
@@ -77,22 +70,25 @@ class GameViewSet(viewsets.ModelViewSet):
         game.players.add(request.user)
         game.save()
 
+        user_details = request.user.details
+        user_details.joined_events_number = user_details.joined_events_number + 1
+        user_details.save()
+
         return Response(status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['patch'])
+    @action(detail=True, methods=['put'])
     def remove_player(self, request, pk=None):
         '''
-        TODO: allow game owner to remove players
         TODO: allow admin to remove players
         '''
         serializer = UsernameSerializer(data=request.data)
-        if not serializer.is_valid():
-            return bad_request(serializer)
+        serializer.is_valid(raise_exception=True)
 
         game = self.get_object()
 
         username = serializer.data['username']
-        if username != request.user.username and username != game.owner.username:
+        if ((username != request.user.username and username != game.owner.username)
+                or request.user.username == game.owner.username):
             return Response(
                 {'error': 'You cannot remove this player'},
                 status=status.HTTP_401_UNAUTHORIZED
@@ -105,8 +101,12 @@ class GameViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        game.players.remove(request.user)
+        game.players.remove(player)
         game.save()
+
+        user_details = player.details
+        user_details.joined_events_number = user_details.joined_events_number - 1
+        user_details.save()
 
         return Response(status=status.HTTP_200_OK)
 
@@ -125,11 +125,7 @@ class FieldsViewSet(viewsets.ReadOnlyModelViewSet):
     @renderer_classes((JSONRenderer,))
     def get_near_fields(self, request):
         serializer = LatLngSerializer(data=request.query_params)
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
 
         lng, lat = float(serializer.data['longitude']), float(
             serializer.data['latitude'])

@@ -4,14 +4,14 @@ import {
   AUTHENTICATING_USER,
   REGISTER_SUCCESS,
   REGISTER_FAIL,
+  USER_DETAILS,
 } from '../actions/types';
 
 const defaultState = {
-  username: null,
   token: null,
   isAuthenticated: false,
   isBeingAuthenticated: false,
-  loginErrors: {},
+  loginErrors: null,
   registerErrors: {},
 };
 
@@ -21,7 +21,6 @@ export default function (state = defaultState, action) {
     case REGISTER_SUCCESS:
       return {
         ...state,
-        username: action.payload.username,
         token: action.payload.token,
         isAuthenticated: true,
         isBeingAuthenticated: false,

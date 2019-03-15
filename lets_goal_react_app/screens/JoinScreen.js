@@ -94,7 +94,7 @@ export class JoinScreen extends Component {
 const mapStateToProps = state => ({
   nearGames: state.gameAPI.nearGames,
   fields: state.gameAPI.fields,
-  isFetchingGames: state.gameAPI.isUsersGamesFetching,
+  isFetchingGames: state.gameAPI.isNearGamesFetching,
 });
 
 // export default EventsScreen;

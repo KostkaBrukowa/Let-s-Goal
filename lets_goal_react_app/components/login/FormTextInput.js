@@ -61,9 +61,9 @@ class FormTextInput extends React.Component {
     return (
       <View>
         <TextInput {...this.props} style={[styles.input, style, error && styles.errorInput]} />
-        <ScrollView style={{ height: animatedValue }} horizontal>
-          <AnimatedText style={[styles.errorText, { height: animatedValue }]}>{error}</AnimatedText>
-        </ScrollView>
+        {/* <ScrollView style={{ height: animatedValue }} horizontal> */}
+        <AnimatedText style={[styles.errorText, { height: animatedValue }]}>{error}</AnimatedText>
+        {/* </ScrollView> */}
       </View>
     );
   }

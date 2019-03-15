@@ -4,14 +4,16 @@ import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
 import { PURPLE_APP_TINT } from '../const/const';
 import GameDetailsScreen from '../screens/GameDetailsScreen';
 import JoinScreen from '../screens/JoinScreen';
+import UserDetailsScreen from '../screens/UserDetailsScreen';
 
 const EventsNavigator = createStackNavigator(
   {
     joinScreen: JoinScreen,
     detailsScreen: GameDetailsScreen,
+    userDetails: UserDetailsScreen,
   },
   {
-    initialRouteName: 'joinScreen',
+    initialRouteName: 'userDetails',
     headerLayoutPreset: 'center',
     navigationOptions: {
       headerTintColor: 'white',

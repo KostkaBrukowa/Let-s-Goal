@@ -9,14 +9,17 @@ import {
   NEW_GAME_FORM_SUBIMT_SUCCESS,
   NEW_GAME_FORM_FAIL,
 } from './types';
-import {tokenConfig} from './authActions'
+import { tokenConfig } from './authActions';
 
 const BASE_URL = 'http://10.0.2.2:8000/';
 
 // eslint-disable-next-line import/prefer-default-export
 export const saveGame = ({
   name, playersNumber, playingField, date,
-}) => async (dispatch, getState) => {
+}) => async (
+  dispatch,
+  getState,
+) => {
   try {
     const urlFriendlyData = {
       name,
@@ -27,7 +30,7 @@ export const saveGame = ({
     const options = {
       method: 'POST',
       body: JSON.stringify(urlFriendlyData),
-      tokenConfig(getState)
+      ...tokenConfig(getState),
     };
     const response = await fetch(`${BASE_URL}games/`, options);
 
@@ -49,7 +52,8 @@ export const fetchNearFields = ({ longitude, latitude }) => async (dispatch, get
     const trim = x => x.toFixed(6); // django needs max 9 numbers
 
     const response = await fetch(
-      `${BASE_URL}fields/get_near_fields/?latitude=${trim(latitude)}&longitude=${trim(longitude)}`, tokenConfig(getState)
+      `${BASE_URL}fields/get_near_fields/?latitude=${trim(latitude)}&longitude=${trim(longitude)}`,
+      tokenConfig(getState),
     );
 
     if (!response.ok) {
@@ -65,7 +69,7 @@ export const fetchNearFields = ({ longitude, latitude }) => async (dispatch, get
   }
 };
 
-export const fetchUserGames = (username, ) => async (dispatch, getState) => {
+export const fetchUserGames = username => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCHING_USERS_GAMES });
     const url = `${BASE_URL}games/get_users_games/?username=${username}`;
@@ -73,7 +77,7 @@ export const fetchUserGames = (username, ) => async (dispatch, getState) => {
     const response = await fetch(url, tokenConfig(getState));
     if (!response.ok) {
       const errorMsg = await response.text();
-      console.log(errorMsg);
+      throw new Error(errorMsg);
     }
 
     const { users_games: usersGames } = await response.json();
@@ -81,6 +85,7 @@ export const fetchUserGames = (username, ) => async (dispatch, getState) => {
     dispatch({ type: LIST_FIELDS, payload: usersGames.map(g => g.playing_field) });
     dispatch({ type: LIST_USERS_GAMES, payload: usersGames.map(g => g.game) });
   } catch (e) {
+    // dispatch({ type: LIST_USERS_GAMES, payload: [] });
     console.log(e);
   }
 };
@@ -90,9 +95,10 @@ export const fetchNearGames = ({ longitude, latitude }) => async (dispatch, getS
     dispatch({ type: FETCHING_NEAR_GAMES });
 
     const trim = x => x.toFixed(6); // django needs max 9 numbers
-
+    
     const response = await fetch(
-      `${BASE_URL}games/get_near_games/?latitude=${trim(latitude)}&longitude=${trim(longitude)}`, tokenConfig(getState)
+      `${BASE_URL}games/get_near_games/?latitude=${trim(latitude)}&longitude=${trim(longitude)}`,
+      tokenConfig(getState),
     );
 
     if (!response.ok) {
