@@ -53,37 +53,33 @@ class WelcomeScreen extends Component {
 
   render() {
     const { height } = Dimensions.get('screen');
-    console.log(FACEBOOK_COLOR);
-
     return (
-      <View style={{ marginTop: Constants.statusBarHeight }}>
-        <BackgroundImage>
-          <Text style={[styles.title]}>Hello</Text>
-          <Text style={[styles.description, { marginBottom: 30, marginLeft: 47, marginRight: 47 }]}>
-            If you want to play football today you are in a right place
-          </Text>
+      <BackgroundImage>
+        <Text style={[styles.title]}>Hello</Text>
+        <Text style={[styles.description, { marginBottom: 30, marginLeft: 47, marginRight: 47 }]}>
+          If you want to play football today you are in a right place
+        </Text>
 
-          <CustomButton
-            containerStyle={styles.buttonConatiner}
-            textStyle={styles.buttonTitle}
-            style={styles.button}
-            color={PURPLE_APP_TINT}
-            title="Login"
-            onPress={() => this.props.navigation.push('login')}
-            // onPress={() => console.log('login')}
-          />
+        <CustomButton
+          containerStyle={styles.buttonConatiner}
+          textStyle={styles.buttonTitle}
+          style={styles.button}
+          color={PURPLE_APP_TINT}
+          title="Login"
+          onPress={() => this.props.navigation.navigate('login')}
+          // onPress={() => console.log('login')}
+        />
 
-          <CustomButton
-            containerStyle={styles.buttonConatiner}
-            textStyle={styles.buttonTitle}
-            style={styles.button}
-            disabled
-            color={FACEBOOK_COLOR}
-            title="Login with Facebook"
-            onPress={() => this.props.navigation.push('register')}
-          />
-        </BackgroundImage>
-      </View>
+        <CustomButton
+          containerStyle={styles.buttonConatiner}
+          textStyle={styles.buttonTitle}
+          style={styles.button}
+          disabled
+          color={FACEBOOK_COLOR}
+          title="Login with Facebook"
+          onPress={() => this.props.navigation.push('register')}
+        />
+      </BackgroundImage>
     );
   }
 }

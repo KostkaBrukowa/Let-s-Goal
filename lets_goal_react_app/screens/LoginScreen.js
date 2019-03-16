@@ -21,6 +21,7 @@ import BackgroundImage from '../components/BackgroundImage';
 import CustomButton from '../components/CustomButton';
 import { login } from '../redux/actions/authActions';
 import FormTextInput from '../components/login/FormTextInput';
+import DescriptionWithLink from '../components/login/DescriptionWithLink';
 
 const styles = StyleSheet.create({
   button: {
@@ -34,16 +35,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: 'white',
   },
-  description: {
-    fontSize: 17,
-    color: 'lightgrey',
-    textAlign: 'center',
-  },
-  textLink: {
-    fontSize: 20,
-    textDecorationLine: 'underline',
-    color: 'white',
-  },
 });
 
 class LoginScreen extends Component {
@@ -53,15 +44,15 @@ class LoginScreen extends Component {
 
   static propTypes = {
     login: PropTypes.func.isRequired,
-    loginErrors: PropTypes.object.isRequired,
+    loginErrors: PropTypes.object,
     isBeingAuthenticated: PropTypes.bool.isRequired,
     isAuthenticated: PropTypes.bool.isRequired,
     navigation: PropTypes.object.isRequired,
   };
 
   state = {
-    username: '',
-    password: '',
+    username: 'Alex',
+    password: 'password',
     usernameError: '',
     passwordError: '',
   };
@@ -80,22 +71,15 @@ class LoginScreen extends Component {
         navigation.navigate('mainApp');
       }
     }
-
-    // checking if authentication was successful
-    // const { isAuthenticated: prevIsAuthenticated } = prevProps;
-    // if (isAuthenticated) {
-    //   const { navigation } = this.props;
-    //   navigation.navigate('mainApp');
-    // }
   };
 
   logUserIn = (username, password) => {
-    // if (username === '' || password === '') {
-    //   if (password === '') this.setState({ passwordError: 'Password cannot be blank' });
-    //   if (username === '') this.setState({ usernameError: 'Login cannot be blank' });
+    if (username === '' || password === '') {
+      if (password === '') this.setState({ passwordError: 'Password cannot be blank' });
+      if (username === '') this.setState({ usernameError: 'Login cannot be blank' });
 
-    //   return;
-    // }
+      return;
+    }
 
     const { login } = this.props;
     login(username, password);
@@ -140,12 +124,11 @@ class LoginScreen extends Component {
             <ActivityIndicator size={46} style={{ marginTop: 30 }} color={PURPLE_APP_TINT} />
           )}
 
-          <View style={[{ margin: 20 }, appStyle.container]}>
-            <Text style={styles.description}>Do not have an account?</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('register')}>
-              <Text style={styles.textLink}>Create one now</Text>
-            </TouchableOpacity>
-          </View>
+          <DescriptionWithLink
+            description="Do not have an account?"
+            linkTitle="Create one now"
+            onLinkPress={() => navigation.navigate('register')}
+          />
         </KeyboardAvoidingView>
       </BackgroundImage>
     );

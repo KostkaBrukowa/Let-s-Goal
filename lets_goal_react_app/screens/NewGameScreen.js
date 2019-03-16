@@ -37,7 +37,6 @@ export class NewGameScreen extends Component {
 
   static navigationOptions = ({ navigation }) => {
     const submitForm = navigation.getParam('submitForm');
-    console.log(submitForm);
 
     return {
       headerRight: <ImageButton onPress={submitForm} iconName="check" />,

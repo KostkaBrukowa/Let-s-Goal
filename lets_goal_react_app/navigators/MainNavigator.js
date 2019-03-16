@@ -11,7 +11,7 @@ const MainNavigator = createSwitchNavigator(
     loginScreen: LoginNavigator,
   },
   {
-    initialRouteName: 'loginScreen',
+    initialRouteName: 'mainApp',
   },
 );
 

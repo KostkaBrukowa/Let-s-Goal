@@ -20,6 +20,7 @@ export default class InfoTile extends Component {
 
   state = {
     animatedValue: new Animated.Value(0.0),
+    buttonDisabled: true,
   };
 
   shouldComponentUpdate = (nextProps) => {
@@ -29,17 +30,22 @@ export default class InfoTile extends Component {
   };
 
   componentDidUpdate = (prevProps) => {
-    console.log('update');
     const { animatedValue } = this.state;
     const { visible } = this.props;
     const { visible: prevVisible } = prevProps;
     if (visible !== prevVisible) {
-      Animated.timing(animatedValue, {
-        toValue: visible ? 1 : 0,
-        duration: 200,
-        useNativeDriver: true,
-        easing: Easing.cubic,
-      }).start();
+      Animated.timing(
+        animatedValue,
+        {
+          toValue: visible ? 1 : 0,
+          duration: 200,
+          useNativeDriver: true,
+          easing: Easing.linear,
+        },
+        () => {
+          // this.setState({ buttonDisabled: !!visible });
+        },
+      ).start();
     }
   };
 
@@ -53,7 +59,7 @@ export default class InfoTile extends Component {
       onButtonPress,
       visible,
     } = this.props;
-    const { animatedValue } = this.state;
+    const { animatedValue, buttonDisabled } = this.state;
     return (
       <Animated.View
         style={{

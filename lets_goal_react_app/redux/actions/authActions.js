@@ -2,23 +2,15 @@
 import {
   LOG_IN_SUCCESS, AUTHENTICATING_USER, LOG_IN_FAIL, REGISTER_FAIL,
 } from './types';
+import { BASE_URL, timeout } from '../../const/commonForActions';
 
-const BASE_URL = 'http://10.0.2.2:8000/';
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function timeout(ms, promise) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      reject(new Error('timeout'));
-    }, ms);
-    promise.then(resolve, reject);
-  });
-}
-
 export const login = (username, password) => async (dispatch) => {
   dispatch({ type: AUTHENTICATING_USER });
+
   try {
     const options = {
       method: 'post',
@@ -28,16 +20,13 @@ export const login = (username, password) => async (dispatch) => {
       body: JSON.stringify({ username, password }),
     };
 
-    const response = await timeout(3000, fetch(`${BASE_URL}accounts/rest_auth/login/`, options));
-    console.log('logging in');
-    await sleep(1000); // only for debugging
+    const response = await timeout(3000, fetch(`${BASE_URL}accounts/rest_auth/log_in/`, options));
 
     if (!response.ok) {
       if (response.status === 400) {
-        console.log('400');
         dispatch({ type: LOG_IN_FAIL, payload: 'Wrong username or password' });
       } else {
-        throw new Error('');
+        throw new Error('Non 400 status code');
       }
       return;
     }
@@ -73,7 +62,6 @@ export const register = ({
       3000,
       fetch(`${BASE_URL}accounts/rest_auth/registration/`, options),
     );
-    await sleep(1000);
 
     const data = await response.json();
 
@@ -99,7 +87,7 @@ export const register = ({
 };
 
 export const tokenConfig = (getState) => {
-  const { token } = getState().auth.token;
+  const { token } = getState().user;
   const options = {
     headers: {
       'Content-Type': 'application/json',

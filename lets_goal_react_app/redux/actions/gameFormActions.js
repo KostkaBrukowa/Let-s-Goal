@@ -10,16 +10,20 @@ import {
   PICK_DATE_FAIL,
   NEW_GAME_FORM_FAIL,
 } from './types';
+import { tokenConfig } from './authActions';
 
 const BASE_URL = 'http://10.0.2.2:8000/';
 
-export const pickName = name => async (dispatch) => {
+export const pickName = name => async (dispatch, getState) => {
   try {
     if (name.length === 0) {
       dispatch({ type: PICK_NAME_FAIL, payload: 'Name cannot be blank' });
       return;
     }
-    const response = await fetch(`${BASE_URL}games/is_name_unique/?name=${name}`);
+    const response = await fetch(
+      `${BASE_URL}games/is_name_unique/?name=${name}`,
+      tokenConfig(getState),
+    );
 
     if (!response.ok) {
       const errorMsg = await response.text();

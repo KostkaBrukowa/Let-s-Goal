@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   View,
+  TouchableOpacity,
   Text,
   ActivityIndicator,
   Button,
@@ -17,6 +18,7 @@ import BackgroundImage from '../components/BackgroundImage';
 import CustomButton from '../components/CustomButton';
 import FormTextInput from '../components/login/FormTextInput';
 import { register } from '../redux/actions/authActions';
+import DescriptionWithLink from '../components/login/DescriptionWithLink';
 
 const styles = StyleSheet.create({
   input: {
@@ -73,10 +75,7 @@ export class LoginScreen extends Component {
 
   parseErrors = () => {
     const { registerErrors } = this.props;
-    console.log(registerErrors.username);
-
     const newErrors = Object.keys(registerErrors).reduce((pValue, key) => {
-      console.log(key);
       if (key !== 'non_field_errors') {
         return { ...pValue, [`${key}Error`]: registerErrors[key][0] };
       }
@@ -113,7 +112,7 @@ export class LoginScreen extends Component {
       emailError,
       mainError,
     } = this.state;
-    const { isBeingAuthenticated } = this.props;
+    const { isBeingAuthenticated, navigation } = this.props;
     return (
       <BackgroundImage>
         <KeyboardAvoidingView style={[appStyle.container]} behavior="padding" enabled>
@@ -163,6 +162,11 @@ export class LoginScreen extends Component {
           ) : (
             <ActivityIndicator size={46} color={PURPLE_APP_TINT} />
           )}
+          <DescriptionWithLink
+            description="Have an account?"
+            linkTitle="Go log in"
+            onLinkPress={() => navigation.navigate('login')}
+          />
         </KeyboardAvoidingView>
       </BackgroundImage>
     );

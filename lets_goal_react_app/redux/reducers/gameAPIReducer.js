@@ -9,15 +9,9 @@ import {
   FETCHING_NEAR_GAMES,
 } from '../actions/types';
 
-// const _uniqueObjects = (array, prop) => {
-//   const keyValueArray = array.map(entry => [entry[prop], entry]);
-//   const map = new Map(keyValueArray);
-//   return Array.from(map.values());
-// };
+import {uniqueObjects} from '../../const/commonForReducers'
 
-function uniqueObjects(array, propertyName) {
-  return array.filter((e, i) => array.findIndex(a => a[propertyName] === e[propertyName]) === i);
-}
+
 export const apiDefaultState = {
   nearGames: [],
   usersGames: [],
