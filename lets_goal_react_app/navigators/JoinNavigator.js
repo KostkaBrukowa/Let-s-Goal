@@ -13,7 +13,7 @@ const EventsNavigator = createStackNavigator(
     userDetails: UserDetailsScreen,
   },
   {
-    initialRouteName: 'userDetails',
+    initialRouteName: 'joinScreen',
     headerLayoutPreset: 'center',
     navigationOptions: {
       headerTintColor: 'white',

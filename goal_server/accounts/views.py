@@ -22,6 +22,15 @@ class UserDetailsViewSet(mixins.CreateModelMixin,
     queryset = UserDetails.objects.all()
     serializer_class = UserDetailsSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        data['username'] = instance.user.username
+        data['email'] = instance.user.email
+        data.pop('user')
+        return Response(data)
+
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == None:  # None coz we dont have list mixin
             permission_classes = (IsAuthenticated,)

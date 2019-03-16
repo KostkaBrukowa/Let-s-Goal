@@ -12,14 +12,14 @@ const styles = StyleSheet.create({
     padding: '1%',
   },
   descriptionText: {
-    fontSize: 15,
+    fontSize: 17,
   },
   leftDescriptionContainer: {
     justifyContent: 'flex-start',
     flex: 1,
   },
   leftDescriptionText: {
-    color: 'grey',
+    color: 'lightgrey',
     textAlign: 'left',
   },
   rightDescriptionContainer: {

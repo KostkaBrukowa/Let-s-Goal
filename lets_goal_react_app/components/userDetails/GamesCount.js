@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     ...appStyle.smallTitle,
   },
   description: {
-    color: 'grey',
+    color: 'lightgrey',
     fontSize: 15,
   },
 });

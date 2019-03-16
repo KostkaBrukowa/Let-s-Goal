@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {
   View,
-  Text,
-  ActivityIndicator,
   Image,
   StyleSheet,
   Dimensions,
@@ -24,10 +22,6 @@ import appStyle from '../const/globalStyles';
 import GamesCountRow from '../components/userDetails/GamesCount';
 
 const profileImageSide = 170;
-const test = {
-  borderWidth: 2,
-  borderColor: 'white',
-};
 
 const styles = StyleSheet.create({
   profileImage: {
@@ -46,7 +40,7 @@ const styles = StyleSheet.create({
     ...appStyle.container,
     flex: 10,
     justifyContent: 'space-evenly',
-    marginBottom: 62,
+    marginBottom: '13%',
   },
   button: { width: 100, marginTop: 5 },
 });
@@ -74,20 +68,20 @@ class UserDetailsScreen extends Component {
   };
 
   componentDidMount = () => {
-    // const { navigation, getUserDetails } = this.props;
-    // const userId = navigation.getParam('userId');
-    // getUserDetails(userId);
+    const { navigation, getUserDetails } = this.props;
+    const userId = navigation.getParam('userId');
+    if (userId) getUserDetails(userId);
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    // const { users } = this.props;
-    // const { users: prevUsers } = prevProps;
-    // if (users !== prevUsers) {
-    //   const { navigation } = this.props;
-    //   const userId = navigation.getParam('userId');
-    //   const user = users.find(user => user.pk === userId);
-    //   this.setState({ user });
-    // }
+    const { users } = this.props;
+    const { users: prevUsers } = prevProps;
+    if (users !== prevUsers) {
+      const { navigation } = this.props;
+      const userId = navigation.getParam('userId');
+      const user = users.find(user => user.id === userId);
+      this.setState({ user });
+    }
   };
 
   toggleEditMode = () => {
@@ -105,24 +99,23 @@ class UserDetailsScreen extends Component {
     const { user, animatedValue, editMode } = this.state;
     const height = Dimensions.get('screen').height - 2 * Header.HEIGHT;
 
-    const profileImage = require('../assets/images/background-field.jpg');
+    const profileImage = require('../assets/images/no-image-profile.png');
     const upperFlex = animatedValue.interpolate({
       inputRange: [0, 1],
       outputRange: [11, 4],
     });
     const upperOpacity = animatedValue.interpolate({
       inputRange: [0, 1],
-      outputRange: [1, 0.2],
+      outputRange: [1, 0.15],
     });
 
-    // if (fetchingUserDetails || !user) {
-
-    //   return (
-    //     <BackgroundImage dim>
-    //       <FullScreenActivityIndicator />
-    //     </BackgroundImage>
-    //   );
-    // }
+    if (fetchingUserDetails || !user) {
+      return (
+        <BackgroundImage dim>
+          <FullScreenActivityIndicator color="white" />
+        </BackgroundImage>
+      );
+    }
     return (
       <BackgroundImage dim>
         <View style={[{ height, width: '100%' }, appStyle.container]}>
@@ -130,31 +123,38 @@ class UserDetailsScreen extends Component {
             style={[styles.upperContainer, { flex: upperFlex, opacity: upperOpacity }]}
           >
             <Image style={styles.profileImage} source={profileImage} />
-            <Title title="rlewandowski9" containerStyle={styles.titleStyle} />
+            <Title title={user.username} containerStyle={styles.titleStyle} />
             <GamesCountRow
               descriptionLeft="created games"
-              countLeft={4}
+              countLeft={user.created_events_number}
               descriptionRight="joined games"
-              countRight={7}
+              countRight={user.joined_events_number}
             />
           </Animated.View>
-          <View style={[styles.lowerContainer]}>
+          <KeyboardAvoidingView
+            style={[styles.lowerContainer]}
+            behavior="padding"
+            enabled={editMode}
+          >
             <Title title="Profile details" containerStyle={styles.titleStyle} />
-            <DescriptionRow leftText="First and last name:" rightText="Robert Lewandowski" />
-            <DescriptionRow leftText="Birth Date:" rightText="22.12.2003" editMode={editMode} />
-            <DescriptionRow leftText="E-mail address:" rightText="roberto@gmail.com" />
-            <DescriptionRow leftText="Address:" rightText="55 Pine Street" editMode={editMode} />
-            <DescriptionRow leftText="Prefered position:" rightText="Goalkeeper" />
+            <DescriptionRow
+              leftText="First and last name:"
+              rightText={`${user.first_name || ''} ${user.last_name || ''}`}
+            />
+            <DescriptionRow leftText="Birth Date:" rightText={user.birth_date || ''} />
+            <DescriptionRow leftText="E-mail address:" rightText={user.email || ''} />
+            <DescriptionRow leftText="Address:" rightText={user.address || ''} />
+            <DescriptionRow leftText="Prefered position:" rightText={user.prefered_position} />
             <View style={styles.button}>
               <Button
-                title="Edit"
+                title={editMode ? 'Save' : 'Edit'}
                 onPress={() => {
                   this.toggleEditMode();
                 }}
                 color={PURPLE_APP_TINT}
               />
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </View>
       </BackgroundImage>
     );

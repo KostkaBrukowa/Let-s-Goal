@@ -17,6 +17,8 @@ class UserDetails(models.Model):
     prefered_position = models.CharField(max_length=50, null=True)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='details')
+    first_name = models.CharField(max_length=30, null=True)
+    last_name = models.CharField(max_length=30, null=True)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

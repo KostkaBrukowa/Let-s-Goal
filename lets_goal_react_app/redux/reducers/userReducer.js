@@ -8,7 +8,7 @@ import {
 } from '../actions/types';
 
 const defaultState = {
-  token: null,
+  token: '6dd0f3e70b8c1c77209bf844276cd43464cb3b25',
   isAuthenticated: false,
   isBeingAuthenticated: false,
   loginErrors: null,
