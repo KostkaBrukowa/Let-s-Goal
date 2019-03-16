@@ -30,7 +30,6 @@ export default class InfoTile extends Component {
   };
 
   componentDidUpdate = (prevProps) => {
-    console.log('update');
     const { animatedValue } = this.state;
     const { visible } = this.props;
     const { visible: prevVisible } = prevProps;

@@ -53,8 +53,6 @@ class WelcomeScreen extends Component {
 
   render() {
     const { height } = Dimensions.get('screen');
-    console.log(FACEBOOK_COLOR);
-
     return (
       <BackgroundImage>
         <Text style={[styles.title]}>Hello</Text>

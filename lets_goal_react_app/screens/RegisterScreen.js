@@ -75,10 +75,7 @@ export class LoginScreen extends Component {
 
   parseErrors = () => {
     const { registerErrors } = this.props;
-    console.log(registerErrors.username);
-
     const newErrors = Object.keys(registerErrors).reduce((pValue, key) => {
-      console.log(key);
       if (key !== 'non_field_errors') {
         return { ...pValue, [`${key}Error`]: registerErrors[key][0] };
       }

@@ -71,17 +71,6 @@ class LoginScreen extends Component {
         navigation.navigate('mainApp');
       }
     }
-    componentWillUnmount = () => {
-      console.log('unmounted');
-    }
-    
-
-    // checking if authentication was successful
-    // const { isAuthenticated: prevIsAuthenticated } = prevProps;
-    // if (isAuthenticated) {
-    //   const { navigation } = this.props;
-    //   navigation.navigate('mainApp');
-    // }
   };
 
   logUserIn = (username, password) => {
