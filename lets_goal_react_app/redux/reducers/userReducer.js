@@ -8,7 +8,8 @@ import {
 } from '../actions/types';
 
 const defaultState = {
-  token: '6dd0f3e70b8c1c77209bf844276cd43464cb3b25',
+  username: null,
+  token: null,
   isAuthenticated: false,
   isBeingAuthenticated: false,
   loginErrors: null,
@@ -22,6 +23,7 @@ export default function (state = defaultState, action) {
       return {
         ...state,
         token: action.payload.token,
+        username: action.payload.username,
         isAuthenticated: true,
         isBeingAuthenticated: false,
         loginErrors: null,

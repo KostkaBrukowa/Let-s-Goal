@@ -40,9 +40,7 @@ export const login = (username, password) => async (dispatch) => {
   }
 };
 
-export const register = ({
-  username, email, password1, password2,
-}) => async (dispatch) => {
+export const register = user => async (dispatch) => {
   dispatch({ type: AUTHENTICATING_USER });
   try {
     const options = {
@@ -50,12 +48,7 @@ export const register = ({
       headers: {
         'Content-type': 'application/json',
       },
-      body: JSON.stringify({
-        username,
-        email,
-        password1,
-        password2,
-      }),
+      body: JSON.stringify(user),
     };
 
     const response = await timeout(
@@ -67,16 +60,15 @@ export const register = ({
 
     if (!response.ok) {
       if (response.status === 400) {
-        console.log(data);
         dispatch({ type: REGISTER_FAIL, payload: data });
       } else {
         const text = await response.text();
-        console.log(text);
+        throw new Error(text);
       }
       return;
     }
 
-    dispatch({ type: LOG_IN_SUCCESS, payload: { token: data.token, username } });
+    dispatch({ type: LOG_IN_SUCCESS, payload: { token: data.token, username: user.username } });
   } catch (e) {
     dispatch({
       type: REGISTER_FAIL,

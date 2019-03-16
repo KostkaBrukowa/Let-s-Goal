@@ -1,14 +1,10 @@
 /* eslint-disable react/require-default-props */
 import React, { Component } from 'react';
-import {
-  StyleSheet,
-  KeyboardAvoidingView,
-  Text,
-} from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, Text } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import BackgroundImageScroll from '../components/BackGroundImageScroll'
+import BackgroundImageScroll from '../components/BackGroundImageScroll';
 import DateTimePicker from '../components/formPickers/DateTime';
 import { pickName, pickPlayers, pickField } from '../redux/actions/gameFormActions';
 import { saveGame } from '../redux/actions/gameAPIActions';
@@ -62,7 +58,7 @@ export class NewGameScreen extends Component {
 
   submit = () => {
     const {
-      name, playersNumber, playingField, date, saveGame,
+      name, playersNumber, playingField, date, saveGame, navigation,
     } = this.props;
 
     const game = {
@@ -72,16 +68,15 @@ export class NewGameScreen extends Component {
       date,
     };
     saveGame(game);
+    navigation.navigate('events');
   };
 
   render() {
     const {
-      name, playersNumber, pickName, pickPlayers, navigation,
+      name, playersNumber, pickName, pickPlayers,
     } = this.props;
     return (
-      <BackgroundImageScroll
-        containerStyle={{ paddingBottom: '4%' }}
-      >
+      <BackgroundImageScroll containerStyle={{ paddingBottom: '4%' }}>
         <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
           <TextPicker
             value={name.value}
@@ -101,11 +96,9 @@ export class NewGameScreen extends Component {
             width={0.25}
           />
           <FourDots />
-          <FieldPicker navigation={navigation} />
+          <FieldPicker />
           <FourDots />
-
           <DateTimePicker />
-          {/* <Button onPress={this.submit} title="submit" /> */}
         </KeyboardAvoidingView>
       </BackgroundImageScroll>
     );

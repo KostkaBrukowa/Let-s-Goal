@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   View,
+  ToastAndroid,
   Image,
   StyleSheet,
   Dimensions,
@@ -12,7 +13,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Header } from 'react-navigation';
 
-import { getUserDetails } from '../redux/actions/appStateActions';
+import { getUserDetails, clearUserDetailFetchError } from '../redux/actions/appStateActions';
 import { PURPLE_APP_TINT } from '../const/const';
 import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
 import BackgroundImage from '../components/BackgroundImage';
@@ -20,6 +21,8 @@ import DescriptionRow from '../components/gameDetails/DescriptionRow';
 import Title from '../components/gameDetails/Title';
 import appStyle from '../const/globalStyles';
 import GamesCountRow from '../components/userDetails/GamesCount';
+import NavigationService from '../navigators/NavigationService';
+import EditButton from '../components/userDetails/EditButton';
 
 const profileImageSide = 170;
 
@@ -47,10 +50,10 @@ const styles = StyleSheet.create({
 
 class UserDetailsScreen extends Component {
   static navigationOptions = ({ navigation }) => {
-    const username = navigation.getParam('username');
+    const title = navigation.getParam('title');
 
     return {
-      title: username || '',
+      title: title || '',
     };
   };
 
@@ -65,6 +68,9 @@ class UserDetailsScreen extends Component {
     getUserDetails: PropTypes.func.isRequired,
     users: PropTypes.array.isRequired,
     navigation: PropTypes.object.isRequired,
+    fetchingError: PropTypes.instanceOf(String),
+    cleanError: PropTypes.func.isRequired,
+    username: PropTypes.string.isRequired,
   };
 
   componentDidMount = () => {
@@ -73,13 +79,24 @@ class UserDetailsScreen extends Component {
     if (userId) getUserDetails(userId);
   };
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate = (prevProps) => {
+    const { fetchingError } = this.props;
+    const { fetchingError: prevFetchingError } = prevProps;
+    if (fetchingError !== prevFetchingError) {
+      const { navigation } = this.props;
+      ToastAndroid.show('Could not connect to a sever', ToastAndroid.SHORT);
+      navigation.goBack();
+    }
+
     const { users } = this.props;
     const { users: prevUsers } = prevProps;
     if (users !== prevUsers) {
-      const { navigation } = this.props;
+      const { navigation, username } = this.props;
       const userId = navigation.getParam('userId');
       const user = users.find(user => user.id === userId);
+
+      const title = username === user.username ? 'Your profile' : user.username;
+      navigation.setParams({ title });
       this.setState({ user });
     }
   };
@@ -95,7 +112,7 @@ class UserDetailsScreen extends Component {
   };
 
   render() {
-    const { fetchingUserDetails } = this.props;
+    const { fetchingUserDetails, username } = this.props;
     const { user, animatedValue, editMode } = this.state;
     const height = Dimensions.get('screen').height - 2 * Header.HEIGHT;
 
@@ -111,13 +128,13 @@ class UserDetailsScreen extends Component {
 
     if (fetchingUserDetails || !user) {
       return (
-        <BackgroundImage dim>
+        <BackgroundImage dim stackHeader>
           <FullScreenActivityIndicator color="white" />
         </BackgroundImage>
       );
     }
     return (
-      <BackgroundImage dim>
+      <BackgroundImage dim stackHeader>
         <View style={[{ height, width: '100%' }, appStyle.container]}>
           <Animated.View
             style={[styles.upperContainer, { flex: upperFlex, opacity: upperOpacity }]}
@@ -126,9 +143,9 @@ class UserDetailsScreen extends Component {
             <Title title={user.username} containerStyle={styles.titleStyle} />
             <GamesCountRow
               descriptionLeft="created games"
-              countLeft={user.created_events_number}
+              countLeft={user.createdEventsNumber}
               descriptionRight="joined games"
-              countRight={user.joined_events_number}
+              countRight={user.joinedEventsNumber}
             />
           </Animated.View>
           <KeyboardAvoidingView
@@ -139,21 +156,17 @@ class UserDetailsScreen extends Component {
             <Title title="Profile details" containerStyle={styles.titleStyle} />
             <DescriptionRow
               leftText="First and last name:"
-              rightText={`${user.first_name || ''} ${user.last_name || ''}`}
+              rightText={`${user.firstName || ''} ${user.lastName || ''}`}
             />
-            <DescriptionRow leftText="Birth Date:" rightText={user.birth_date || ''} />
+            <DescriptionRow leftText="Birth Date:" rightText={user.birthDate || ''} />
             <DescriptionRow leftText="E-mail address:" rightText={user.email || ''} />
             <DescriptionRow leftText="Address:" rightText={user.address || ''} />
-            <DescriptionRow leftText="Prefered position:" rightText={user.prefered_position} />
-            <View style={styles.button}>
-              <Button
-                title={editMode ? 'Save' : 'Edit'}
-                onPress={() => {
-                  this.toggleEditMode();
-                }}
-                color={PURPLE_APP_TINT}
-              />
-            </View>
+            <DescriptionRow leftText="Prefered position:" rightText={user.preferedPosition} />
+            <EditButton
+              editMode={editMode}
+              visible={user.username === username}
+              onPress={this.toggleEditMode}
+            />
           </KeyboardAvoidingView>
         </View>
       </BackgroundImage>
@@ -164,9 +177,11 @@ class UserDetailsScreen extends Component {
 const mapStateToProps = state => ({
   users: state.appState.users,
   fetchingUserDetails: state.appState.fetchingUserDetails,
+  fetchingError: state.appState.fetchingError,
+  username: state.user.username,
 });
 
 export default connect(
   mapStateToProps,
-  { getUserDetails },
+  { getUserDetails, cleanError: clearUserDetailFetchError },
 )(UserDetailsScreen);

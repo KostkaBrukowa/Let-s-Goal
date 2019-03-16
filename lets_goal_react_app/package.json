@@ -5,10 +5,12 @@
     "a": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
-    "test": "jest"
+    "test": "jest",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "babel-eslint": "^10.0.1",
+    "case-converter": "^1.0.1",
     "expo": "^32.0.0",
     "immutable": "^4.0.0-rc.12",
     "prop-types": "^15.7.2",

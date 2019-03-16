@@ -1,13 +1,6 @@
 import React from 'react';
 import {
-  Image,
-  StyleSheet,
-  View,
-  Text,
-  Dimensions,
-  ScrollView,
-  Button,
-  TouchableOpacity,
+  StyleSheet, View, Dimensions, ScrollView, Button,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -35,8 +28,6 @@ const styles = StyleSheet.create({
     padding: '4%',
   },
 });
-
-function goToUserDetails(userId) {}
 
 function GameDetailsScreen(props) {
   const { width, height } = Dimensions.get('window');

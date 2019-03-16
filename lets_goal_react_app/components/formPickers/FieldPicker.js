@@ -5,16 +5,17 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import InputImage from '../InputImage';
+import NavigationService from '../../navigators/NavigationService';
 
 const FieldPicker = (props) => {
-  const { navigation, field, fieldErrors } = props;
+  const { field, fieldErrors } = props;
   const isSelected = field != null && !fieldErrors;
   return (
     <View>
       <InputImage
         icon="map"
         iconSize={50}
-        onPress={() => navigation.navigate('map')}
+        onPress={() => NavigationService.navigate('map')}
         isSelected={isSelected}
         title="Pick a field"
         isInvalid={fieldErrors != null}

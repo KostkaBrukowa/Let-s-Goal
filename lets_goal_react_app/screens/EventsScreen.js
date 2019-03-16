@@ -2,27 +2,19 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  Dimensions,
-  ImageBackground,
-  TouchableOpacity,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
 import PropTypes from 'prop-types';
-import { Constants } from 'expo';
-import { Set } from 'immutable';
 
 import { fetchUserGames } from '../redux/actions/gameAPIActions';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
-import PickFieldCallout from '../components/PickFieldCallout';
-import { ALMOST_WHITE_TINT, PURPLE_APP_TINT } from '../const/const';
+import { PURPLE_APP_TINT } from '../const/const';
 import GameTile from '../components/GameTile';
 import BackgroundImageScroll from '../components/BackGroundImageScroll';
 import { showGame } from '../redux/actions/appStateActions';
+import NavigationService from '../navigators/NavigationService';
+import EditButton from '../components/userDetails/EditButton';
+import NewGameTile from '../components/userDetails/NewGameTile';
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -31,30 +23,12 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    // flex: 1,
-  },
-  box: {
-    width: 130,
-    height: 130,
-    borderWidth: 1,
-    borderColor: 'white',
-    margin: 5,
   },
   title: {
-    // width: '100%',
     paddingTop: '10%',
     color: 'white',
     fontSize: 20,
     textAlign: 'center',
-  },
-  textInBox: {
-    fontSize: 22,
-    textAlign: 'center',
-    color: 'white',
-  },
-  addNewEventBox: {
-    backgroundColor: PURPLE_APP_TINT,
-    justifyContent: 'center',
   },
 });
 
@@ -71,11 +45,12 @@ export class EventsScreen extends Component {
     fields: PropTypes.array.isRequired,
     fetchUserGames: PropTypes.func.isRequired,
     showGame: PropTypes.func.isRequired,
+    username: PropTypes.string.isRequired,
   };
 
   componentDidMount = () => {
-    const { fetchUserGames } = this.props;
-    fetchUserGames('Alex');
+    const { fetchUserGames, username } = this.props;
+    fetchUserGames(username);
   };
 
   goToGameDetails(game, field) {
@@ -86,7 +61,7 @@ export class EventsScreen extends Component {
 
   render() {
     const {
-      isFetchingGames, usersGames, fields, fetchUserGames,
+      isFetchingGames, usersGames, fields, fetchUserGames, username,
     } = this.props;
     // You haven't signed for any games yet. Click button below to add new one or go to Join
     // tab to join existing game.
@@ -106,16 +81,14 @@ export class EventsScreen extends Component {
     return (
       <BackgroundImageScroll
         containerStyle={{ height: '100%' }}
-        onRefresh={() => fetchUserGames('Alex')}
+        onRefresh={() => fetchUserGames(username)}
         isLoading={isFetchingGames}
       >
         <View style={[{ paddingRight: '5%', paddingLeft: '5%' }, styles.container]}>
           <Text style={styles.title}>My events</Text>
           <ScrollView horizontal>
             {gameTiles}
-            <TouchableOpacity style={[styles.box, styles.addNewEventBox]}>
-              <Text style={styles.textInBox}>Add new event</Text>
-            </TouchableOpacity>
+            <NewGameTile />
           </ScrollView>
         </View>
       </BackgroundImageScroll>
@@ -127,6 +100,7 @@ const mapStateToProps = state => ({
   usersGames: state.gameAPI.usersGames,
   fields: state.gameAPI.fields,
   isFetchingGames: state.gameAPI.isUsersGamesFetching,
+  username: state.user.username,
 });
 
 // export default EventsScreen;
