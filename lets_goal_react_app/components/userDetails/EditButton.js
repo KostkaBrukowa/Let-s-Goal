@@ -1,26 +1,23 @@
 import React from 'react';
-import { View, Button, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { PURPLE_APP_TINT } from '../../const/const';
+import SwitchButton from '../SwitchButton';
 
-const styles = StyleSheet.create({
-  button: { width: 100, marginTop: 5 },
-});
-
-function EditButton({ editMode, visible, onPress }) {
+function EditButton(props) {
+  const { editMode, visible } = props;
   if (!visible) return null;
 
-  return (
-    <View style={styles.button}>
-      <Button title={editMode ? 'Save' : 'Edit'} onPress={onPress} color={PURPLE_APP_TINT} />
-    </View>
-  );
+  return <SwitchButton title1="Save" title2="Edit" displayFirst={editMode} {...props} />;
 }
 
 EditButton.propTypes = {
   editMode: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   onPress: PropTypes.func.isRequired,
+  buttonStyle: PropTypes.object,
+};
+
+EditButton.defaultProps = {
+  buttonStyle: {},
 };
 
 export default EditButton;

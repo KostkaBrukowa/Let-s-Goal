@@ -121,7 +121,7 @@ class LoginScreen extends Component {
               color={PURPLE_APP_TINT}
             />
           ) : (
-            <ActivityIndicator size={46} style={{ marginTop: 30 }} color={PURPLE_APP_TINT} />
+            <ActivityIndicator size={46} style={{ marginTop: 30 }} color="white" />
           )}
 
           <DescriptionWithLink

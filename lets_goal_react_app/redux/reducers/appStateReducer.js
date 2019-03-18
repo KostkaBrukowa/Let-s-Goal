@@ -50,11 +50,6 @@ export default function (state = defaultState, action) {
         ...state,
         location: action.payload,
       };
-    case CLEAR_ERROR:
-      return {
-        ...state,
-        fetchingError: null,
-      };
     default:
       return state;
   }

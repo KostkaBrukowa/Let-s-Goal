@@ -10,6 +10,7 @@ import {
 const defaultState = {
   username: null,
   token: null,
+  userId: null,
   isAuthenticated: false,
   isBeingAuthenticated: false,
   loginErrors: null,
@@ -24,6 +25,7 @@ export default function (state = defaultState, action) {
         ...state,
         token: action.payload.token,
         username: action.payload.username,
+        userId: action.payload.userId,
         isAuthenticated: true,
         isBeingAuthenticated: false,
         loginErrors: null,

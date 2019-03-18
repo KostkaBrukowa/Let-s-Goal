@@ -31,9 +31,9 @@ export const login = (username, password) => async (dispatch) => {
       return;
     }
 
-    const { token } = await response.json();
+    const { token, user_id: userId } = await response.json();
 
-    dispatch({ type: LOG_IN_SUCCESS, payload: { token, username } });
+    dispatch({ type: LOG_IN_SUCCESS, payload: { token, username, userId } });
   } catch (e) {
     dispatch({ type: LOG_IN_FAIL, payload: 'There was a problem with connecting with a server' });
     console.log(e);

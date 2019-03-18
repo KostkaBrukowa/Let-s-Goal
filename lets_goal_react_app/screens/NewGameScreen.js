@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import BackgroundImageScroll from '../components/BackGroundImageScroll';
 import DateTimePicker from '../components/formPickers/DateTime';
 import { pickName, pickPlayers, pickField } from '../redux/actions/gameFormActions';
-import { saveGame } from '../redux/actions/gameAPIActions';
+import { saveGame } from '../redux/actions/gameManagerActions';
 import FourDots from '../components/FourDots';
 import TextPicker from '../components/formPickers/TextPicker';
 import FieldPicker from '../components/formPickers/FieldPicker';
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 
 export class NewGameScreen extends Component {
   static navigationOptions = {
-    headerRight: <Text>fdlfladsjk</Text>,
+    headerRight: <Text>New game screen</Text>,
   };
 
   static navigationOptions = ({ navigation }) => {

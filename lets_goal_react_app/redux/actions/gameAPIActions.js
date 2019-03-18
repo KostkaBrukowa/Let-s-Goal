@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import caseConverter from 'case-converter';
 import {
-  SAVE_GAME,
   LIST_USERS_GAMES,
   LIST_USERS_GAMES_FAIL,
   LIST_NEAR_GAMES,
@@ -9,38 +8,10 @@ import {
   LIST_FIELDS,
   FETCHING_USERS_GAMES,
   FETCHING_NEAR_GAMES,
-  NEW_GAME_FORM_SUBIMT_SUCCESS,
-  NEW_GAME_FORM_FAIL,
 } from './types';
 import { tokenConfig } from './authActions';
-import { timeout } from '../../const/commonForActions';
+import { timeout, BASE_URL } from '../../const/commonForActions';
 
-const BASE_URL = 'http://10.0.2.2:8000/';
-
-// eslint-disable-next-line import/prefer-default-export
-export const saveGame = form => async (dispatch, getState) => {
-  try {
-    const urlFriendlyData = caseConverter.toSnakeCase(form);
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(urlFriendlyData),
-      ...tokenConfig(getState),
-    };
-
-    const response = await timeout(10000, fetch(`${BASE_URL}games/`, options));
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(text);
-    }
-
-    const newGame = await response.json();
-
-    dispatch({ type: NEW_GAME_FORM_SUBIMT_SUCCESS, payload: newGame });
-  } catch (e) {
-    dispatch({ type: NEW_GAME_FORM_FAIL, payload: e.message });
-  }
-};
 
 export const fetchNearFields = ({ longitude, latitude }) => async (dispatch, getState) => {
   try {
@@ -105,5 +76,21 @@ export const fetchNearGames = ({ longitude, latitude }) => async (dispatch, getS
     dispatch({ type: LIST_NEAR_GAMES, payload: nearGames.map(g => g.game) });
   } catch (e) {
     dispatch({ type: LIST_NEAR_GAMES_FAIL, payload: e.message });
+  }
+};
+
+export const fetchGame = (gameId) => async (dispatch) => {
+  dispatch({ type: });
+  try {
+    const url = ``
+    const response = await fetch(url);
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      throw new Error(errorMsg);
+    }
+    const {  } = await response.json();
+    dispatch({ type:  , payload:  });
+  } catch (e) {
+    dispatch({ type:  , payload: e.message });
   }
 };
