@@ -2,7 +2,7 @@ import { Set, List } from 'immutable';
 
 import {
   NEW_GAME_FORM_SUBIMT_SUCCESS,
-  LIST_USERS_GAMES,
+  LIST_GAMES,
   LIST_NEAR_GAMES,
   LIST_FIELDS,
   FETCHING_USERS_GAMES,
@@ -15,7 +15,7 @@ import { uniqueObjects } from '../../const/commonForReducers';
 
 export const apiDefaultState = {
   nearGames: [],
-  usersGames: [],
+  games: [],
   fields: [],
   isNearGamesFetching: false,
   isUsersGamesFetching: false,
@@ -35,11 +35,11 @@ export default function (state = apiDefaultState, action) {
         ...state,
         isUsersGamesFetching: true,
       };
-    case LIST_USERS_GAMES: {
-      const { usersGames } = state;
+    case LIST_GAMES: {
+      const { games } = state;
       return {
         ...state,
-        usersGames: uniqueObjects([...usersGames, ...action.payload], 'id'),
+        games: uniqueObjects([...games, ...action.payload], 'id'),
         isUsersGamesFetching: false,
       };
     }
@@ -55,12 +55,15 @@ export default function (state = apiDefaultState, action) {
         ...state,
         isNearGamesFetching: true,
       };
-    case LIST_NEAR_GAMES:
+    case LIST_NEAR_GAMES: {
+      const { games } = state;
       return {
         ...state,
         nearGames: action.payload,
+        games: uniqueObjects([...games, ...action.payload], 'id'),
         isNearGamesFetching: false,
       };
+    }
     case LIST_NEAR_GAMES_FAIL:
       return {
         ...state,

@@ -69,6 +69,7 @@ export const register = user => async (dispatch) => {
     }
 
     dispatch({ type: LOG_IN_SUCCESS, payload: { token: data.token, username: user.username } });
+    // dispatch({ type: LOG_IN_SUCCESS });
   } catch (e) {
     dispatch({
       type: REGISTER_FAIL,

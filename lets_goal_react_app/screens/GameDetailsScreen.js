@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import {
   StyleSheet, View, Dimensions, ScrollView,
@@ -13,6 +14,8 @@ import DescriptionRow from '../components/gameDetails/DescriptionRow';
 import Title from '../components/gameDetails/Title';
 import PlayerImageTile from '../components/gameDetails/PlayerImageTile';
 import DownButton from '../components/gameDetails/DownButton';
+import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
+import BackgroundImage from '../components/BackgroundImage';
 
 const styles = StyleSheet.create({
   container: {
@@ -26,57 +29,88 @@ const styles = StyleSheet.create({
   },
 });
 
-function GameDetailsScreen(props) {
-  const { width, height } = Dimensions.get('window');
-  const { game, field, userId } = props;
-  const {
-    owner: gameOwner, date, players, playersNumber: maxPlayers,
-  } = game;
-  const {
-    street, longitude, latitude, owner, pricePerHour,
-  } = field;
+// eslint-disable-next-line react/prefer-stateless-function
+class GameDetailsScreen extends React.Component {
+  // componentDidMount = () => {
+  //   this.getGame();
+  // }
+  // componentDidUpdate = (prevProps, prevState) => {
+  //   const { games } = this.props;
+  //   const { games: prevGames } = prevProps;
+  //   if(games !== prevGames) {
+  //     this.getGame()
+  //   }
+  // }
 
-  const dateString = date.substring(0, 10).replace(/-/g, '.');
-  const hourString = date.substring(11, 16);
+  // getGame = () => {
+  //   const { games, navigation } = this.props
+  //   const {gameId} = navigation.getParam('gameId')
 
-  const numberOfPlayersStr = `${players.length}/${maxPlayers}`;
+  // }
 
-  const initialRegion = {
-    latitude,
-    longitude,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  };
+  render() {
+    const { width, height } = Dimensions.get('window');
+    const { games, fields, navigation } = this.props;
+    const gameId = navigation.getParam('gameId');
+    const game = games.find(game => game.id === gameId);
 
-  const mapStyle = { height: 0.53 * height, width, marginBottom: '3%' };
+    if (!game) {
+      return (
+        <BackgroundImage dim stackHeader>
+          <FullScreenActivityIndicator color="white" />
+        </BackgroundImage>
+      );
+    }
 
-  const playersTiles = players.map(player => <PlayerImageTile playerId={player} key={player} />);
+    const field = fields.find(field => field.id === game.playing_field);
 
-  return (
-    <BackgroundImageScroll containerStyle={{ paddingBottom: '4%' }}>
-      <MapView style={mapStyle} initialRegion={initialRegion}>
-        <Marker coordinate={{ longitude, latitude }} title={owner} />
-      </MapView>
-      <View style={[styles.container]}>
-        <Title title="Players" />
-        <ScrollView style={styles.horizontalScroll} horizontal>
-          {playersTiles}
-        </ScrollView>
-        <Title title="Game details" />
-        <DescriptionRow leftText="Game adress: " rightText={`ul. ${street}`} />
-        <DescriptionRow leftText="Date: " rightText={dateString} />
-        <DescriptionRow leftText="Time: " rightText={hourString} />
-        <DescriptionRow leftText="Number of players: " rightText={numberOfPlayersStr} />
-        <DescriptionRow leftText="Price: " rightText={`${pricePerHour} USD`} />
-        <DownButton players={players} owner={gameOwner} />
-      </View>
-    </BackgroundImageScroll>
-  );
+    const {
+      owner: gameOwner, date, players, players_number: maxPlayers,
+    } = game;
+    const {
+      street, longitude, latitude, owner, price_per_hour: pricePerHour,
+    } = field;
+
+    const dateString = date.substring(0, 10).replace(/-/g, '.');
+    const hourString = date.substring(11, 16);
+
+    const numberOfPlayersStr = `${players.length}/${maxPlayers}`;
+
+    const initialRegion = {
+      latitude,
+      longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    };
+
+    const mapStyle = { height: 0.53 * height, width, marginBottom: '3%' };
+
+    const playersTiles = players.map(player => <PlayerImageTile playerId={player} key={player} />);
+
+    return (
+      <BackgroundImageScroll containerStyle={{ paddingBottom: '4%' }}>
+        <MapView style={mapStyle} initialRegion={initialRegion}>
+          <Marker coordinate={{ longitude, latitude }} title={owner} />
+        </MapView>
+        <View style={[styles.container]}>
+          <Title title="Players" />
+          <ScrollView style={styles.horizontalScroll} horizontal>
+            {playersTiles}
+          </ScrollView>
+          <Title title="Game details" />
+          <DescriptionRow leftText="Game adress: " rightText={`ul. ${street}`} />
+          <DescriptionRow leftText="Date: " rightText={dateString} />
+          <DescriptionRow leftText="Time: " rightText={hourString} />
+          <DescriptionRow leftText="Number of players: " rightText={numberOfPlayersStr} />
+          <DescriptionRow leftText="Price: " rightText={`${pricePerHour} USD`} />
+          <DownButton gameId={game.id} players={players} owner={gameOwner} />
+        </View>
+      </BackgroundImageScroll>
+    );
+  }
 }
 
 GameDetailsScreen.propTypes = {
-  game: PropTypes.object.isRequired,
-  field: PropTypes.object.isRequired,
   userId: PropTypes.number.isRequired,
 };
 
@@ -85,8 +119,8 @@ GameDetailsScreen.navigationOptions = ({ navigation }) => ({
 });
 
 const mapStateToProps = state => ({
-  game: caseConverter.toCamelCase(state.appState.currentGameDetail),
-  field: caseConverter.toCamelCase(state.appState.currentGameField),
+  games: state.gameAPI.games,
+  fields: state.gameAPI.fields,
   userId: state.user.userId,
 });
 

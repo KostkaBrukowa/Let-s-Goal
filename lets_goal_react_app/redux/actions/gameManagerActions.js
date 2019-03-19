@@ -8,6 +8,9 @@ import {
   REMOVE_PLAYER_FAIL,
   NEW_GAME_FORM_SUBIMT_SUCCESS,
   NEW_GAME_FORM_FAIL,
+  LIST_NEAR_GAMES,
+  LIST_USERS_GAMES,
+  LIST_GAMES,
 } from './types';
 import { tokenConfig } from './authActions';
 import { timeout, BASE_URL, TimeoutError } from '../../const/commonForActions';
@@ -37,30 +40,11 @@ export const saveGame = form => async (dispatch, getState) => {
   }
 };
 
-export const joinGame = () => async (dispatch, getState) => {
+export const joinGame = gameId => async (dispatch, getState) => {
   dispatch({ type: JOINING_GAME });
   try {
-    const url = `${BASE_URL}games/join_game/`;
-    const response = await timeout(10000, fetch(url, tokenConfig(getState)));
-
-    if (!response.ok) {
-      const errorMsg = await response.text();
-      throw new Error(errorMsg);
-    }
-
-    dispatch({ type: JOIN_GAME_SUCCESS });
-  } catch (e) {
-    if (e instanceof TimeoutError) {
-      dispatch({ type: JOIN_GAME_FAIL, payload: 'Could not connect to a server' });
-    } else dispatch({ type: JOIN_GAME_FAIL, payload: e.message });
-  }
-};
-
-export const removePlayerFromGame = username => async (dispatch, getState) => {
-  dispatch({ type: REMOVING_PLAYER });
-  try {
-    const config = { ...tokenConfig(getState), username };
-    const url = `${BASE_URL}/games/remove_player/`;
+    const url = `${BASE_URL}games/${gameId}/join_game/`;
+    const config = { ...tokenConfig(getState), method: 'PUT' };
     const response = await timeout(10000, fetch(url, config));
 
     if (!response.ok) {
@@ -68,7 +52,34 @@ export const removePlayerFromGame = username => async (dispatch, getState) => {
       throw new Error(errorMsg);
     }
 
+    const { game } = await response.json();
+
+    dispatch({ type: JOIN_GAME_SUCCESS });
+    dispatch({ type: LIST_GAMES, payload: [game] });
+  } catch (e) {
+    if (e instanceof TimeoutError) {
+      dispatch({ type: JOIN_GAME_FAIL, payload: 'Could not connect to a server' });
+    } else dispatch({ type: JOIN_GAME_FAIL, payload: e.message });
+    console.log(e.message);
+  }
+};
+
+export const removePlayerFromGame = (username, gameId) => async (dispatch, getState) => {
+  dispatch({ type: REMOVING_PLAYER });
+  try {
+    const config = { ...tokenConfig(getState), body: { username } };
+    const url = `${BASE_URL}/games/${gameId}/remove_player/`;
+    const response = await timeout(10000, fetch(url, config));
+
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      throw new Error(errorMsg);
+    }
+
+    const { game } = await response.json();
+
     dispatch({ type: REMOVE_PLAYER_SUCCESS });
+    dispatch({ type: LIST_GAMES, payload: [game] });
   } catch (e) {
     if (e instanceof TimeoutError) {
       dispatch({ type: REMOVE_PLAYER_FAIL, payload: 'Could not connect to a server' });

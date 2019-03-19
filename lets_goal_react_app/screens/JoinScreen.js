@@ -41,6 +41,7 @@ export class JoinScreen extends Component {
     nearGamesError: PropTypes.string,
     location: PropTypes.object,
     isFetchingGames: PropTypes.bool.isRequired,
+    userId: PropTypes.number.isRequired,
 
     fetchNearGames: PropTypes.func.isRequired,
     showGame: PropTypes.func.isRequired,
@@ -76,10 +77,8 @@ export class JoinScreen extends Component {
     fetchNearGames(location || reduxLocation);
   };
 
-  goToGameDetails = (game, field) => {
-    const { showGame } = this.props;
-    showGame(game, field);
-    NavigationService.navigate('detailsScreen', { gameName: game.name });
+  goToGameDetails = (game) => {
+    NavigationService.navigate('detailsScreen', { gameId: game.id, gameName: game.name });
   };
 
   toggleInfoTile = (gameId) => {
@@ -92,23 +91,27 @@ export class JoinScreen extends Component {
   };
 
   render() {
-    const { nearGames, fields, isFetchingGames } = this.props;
+    const {
+      fields, isFetchingGames, userId, nearGames,
+    } = this.props;
     const { visibleTileSet } = this.state;
-    const gameTiles = nearGames.map((game) => {
-      const field = fields.filter(f => f.id === game.playing_field)[0];
-      return (
-        <GameTile key={game.id} onPress={() => this.toggleInfoTile(game.id)} side={160}>
-          <InfoTile
-            {...game}
-            {...field}
-            visible={visibleTileSet.contains(game.id)}
-            currentPlayers={game.players.length}
-            maxPlayers={game.players_number}
-            onButtonPress={() => this.goToGameDetails(game, field)}
-          />
-        </GameTile>
-      );
-    });
+    const gameTiles = nearGames
+      .filter(game => game.owner !== userId)
+      .map((game) => {
+        const field = fields.filter(f => f.id === game.playing_field)[0];
+        return (
+          <GameTile key={game.id} onPress={() => this.toggleInfoTile(game.id)} side={160}>
+            <InfoTile
+              {...game}
+              {...field}
+              visible={!visibleTileSet.contains(game.id)}
+              currentPlayers={game.players.length}
+              maxPlayers={game.players_number}
+              onButtonPress={() => this.goToGameDetails(game, field)}
+            />
+          </GameTile>
+        );
+      });
 
     return (
       <BackgroundImageScroll
@@ -129,6 +132,7 @@ const mapStateToProps = state => ({
   isFetchingGames: state.gameAPI.isNearGamesFetching,
   nearGamesError: state.gameAPI.nearGamesError,
   location: state.appState.location,
+  userId: state.user.userId,
 });
 
 // export default EventsScreen;

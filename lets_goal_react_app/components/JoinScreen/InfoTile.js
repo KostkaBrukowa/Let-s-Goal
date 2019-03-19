@@ -29,24 +29,27 @@ export default class InfoTile extends Component {
     return visible !== nextVisible || currentPlayers !== nextCurrentPlayers;
   };
 
+  componentDidMount = () => {
+    this.setVisibility();
+  };
+
   componentDidUpdate = (prevProps) => {
-    const { animatedValue } = this.state;
     const { visible } = this.props;
     const { visible: prevVisible } = prevProps;
     if (visible !== prevVisible) {
-      Animated.timing(
-        animatedValue,
-        {
-          toValue: visible ? 1 : 0,
-          duration: 200,
-          useNativeDriver: true,
-          easing: Easing.linear,
-        },
-        () => {
-          // this.setState({ buttonDisabled: !!visible });
-        },
-      ).start();
+      this.setVisibility();
     }
+  };
+
+  setVisibility = () => {
+    const { animatedValue } = this.state;
+    const { visible } = this.props;
+    Animated.timing(animatedValue, {
+      toValue: visible ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+      easing: Easing.linear,
+    }).start();
   };
 
   render() {

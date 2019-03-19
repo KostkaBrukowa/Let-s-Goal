@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import caseConverter from 'case-converter';
 import {
-  LIST_USERS_GAMES,
+  LIST_GAMES,
   LIST_USERS_GAMES_FAIL,
   LIST_NEAR_GAMES,
   LIST_NEAR_GAMES_FAIL,
@@ -11,7 +11,6 @@ import {
 } from './types';
 import { tokenConfig } from './authActions';
 import { timeout, BASE_URL } from '../../const/commonForActions';
-
 
 export const fetchNearFields = ({ longitude, latitude }) => async (dispatch, getState) => {
   try {
@@ -49,7 +48,7 @@ export const fetchUserGames = username => async (dispatch, getState) => {
     const { users_games: usersGames } = await response.json();
 
     dispatch({ type: LIST_FIELDS, payload: usersGames.map(g => g.playing_field) });
-    dispatch({ type: LIST_USERS_GAMES, payload: usersGames.map(g => g.game) });
+    dispatch({ type: LIST_GAMES, payload: usersGames.map(g => g.game) });
   } catch (e) {
     dispatch({ type: LIST_USERS_GAMES_FAIL, payload: e.message });
   }
@@ -76,21 +75,5 @@ export const fetchNearGames = ({ longitude, latitude }) => async (dispatch, getS
     dispatch({ type: LIST_NEAR_GAMES, payload: nearGames.map(g => g.game) });
   } catch (e) {
     dispatch({ type: LIST_NEAR_GAMES_FAIL, payload: e.message });
-  }
-};
-
-export const fetchGame = (gameId) => async (dispatch) => {
-  dispatch({ type: });
-  try {
-    const url = ``
-    const response = await fetch(url);
-    if (!response.ok) {
-      const errorMsg = await response.text();
-      throw new Error(errorMsg);
-    }
-    const {  } = await response.json();
-    dispatch({ type:  , payload:  });
-  } catch (e) {
-    dispatch({ type:  , payload: e.message });
   }
 };

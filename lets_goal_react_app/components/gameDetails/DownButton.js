@@ -7,7 +7,7 @@ import { joinGame, removePlayerFromGame } from '../../redux/actions/gameManagerA
 import { PURPLE_APP_TINT } from '../../const/const';
 
 function DownButton(props) {
-  const { joiningGame, removingPlayer } = props;
+  const { joiningGame, removingPlayer, gameId } = props;
 
   if (joiningGame || removingPlayer) {
     return <ActivityIndicator size={46} color="white" />;
@@ -31,7 +31,7 @@ function DownButton(props) {
     onPress = () => removePlayerFromGame(username);
   } else {
     title = 'Join the game';
-    onPress = props.joinGame;
+    onPress = () => props.joinGame(gameId);
   }
   return (
     <View style={buttonStyle}>
@@ -45,14 +45,15 @@ DownButton.propTypes = {
   players: PropTypes.array.isRequired,
   owner: PropTypes.number.isRequired,
   buttonStyle: PropTypes.object,
+  gameId: PropTypes.number.isRequired,
   // redux state
   userId: PropTypes.number.isRequired,
   username: PropTypes.string.isRequired,
-  joiningGame: PropTypes.func.isRequired,
-  removingPlayer: PropTypes.func.isRequired,
+  joiningGame: PropTypes.bool.isRequired,
+  removingPlayer: PropTypes.bool.isRequired,
   // redux actions
   removePlayerFromGame: PropTypes.func.isRequired,
-  joinGame: PropTypes.func.isRequired,,
+  joinGame: PropTypes.func.isRequired,
 };
 DownButton.defaultProps = {
   buttonStyle: {},
@@ -64,7 +65,7 @@ const mapStateToProps = state => ({
   removingPlayer: state.gameManager.removingPlayer,
   removeErrors: state.gameManager.removeErrors,
   userId: state.user.userId,
-  usernname: state.user.username,
+  username: state.user.username,
 });
 const mapDispatchToProps = {
   joinGame,

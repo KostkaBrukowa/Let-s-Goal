@@ -74,7 +74,7 @@ class GameViewSet(viewsets.ModelViewSet):
         user_details.joined_events_number = user_details.joined_events_number + 1
         user_details.save()
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({game: game}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['put'])
     def remove_player(self, request, pk=None):
@@ -107,8 +107,9 @@ class GameViewSet(viewsets.ModelViewSet):
         user_details = player.details
         user_details.joined_events_number = user_details.joined_events_number - 1
         user_details.save()
+        print('here')
 
-        return Response(status=status.HTTP_200_OK)
+        return Response({game: game}, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
         serializer.save(players=[self.request.user], owner=self.request.user)

@@ -51,7 +51,7 @@ class LoginScreen extends Component {
   };
 
   state = {
-    username: 'Alex',
+    username: 'Mark',
     password: 'password',
     usernameError: '',
     passwordError: '',

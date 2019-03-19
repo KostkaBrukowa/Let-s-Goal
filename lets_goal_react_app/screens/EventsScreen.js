@@ -41,11 +41,12 @@ export class EventsScreen extends Component {
 
   static propTypes = {
     isFetchingGames: PropTypes.bool.isRequired,
-    usersGames: PropTypes.array.isRequired,
+    games: PropTypes.array.isRequired,
     fields: PropTypes.array.isRequired,
     fetchUserGames: PropTypes.func.isRequired,
     showGame: PropTypes.func.isRequired,
     username: PropTypes.string.isRequired,
+    userId: PropTypes.number.isRequired,
   };
 
   componentDidMount = () => {
@@ -53,30 +54,31 @@ export class EventsScreen extends Component {
     fetchUserGames(username);
   };
 
-  goToGameDetails(game, field) {
-    const { showGame, navigation } = this.props;
-    showGame(game, field);
-    navigation.navigate('detailsScreen', { gameName: game.name });
+  goToGameDetails(game) {
+    const { navigation } = this.props;
+    navigation.navigate('detailsScreen', { gameName: game.name, gameId: game.id });
   }
 
   render() {
     const {
-      isFetchingGames, usersGames, fields, fetchUserGames, username,
+      isFetchingGames, games, fields, fetchUserGames, username, userId,
     } = this.props;
     // You haven't signed for any games yet. Click button below to add new one or go to Join
     // tab to join existing game.
 
-    const gameTiles = usersGames.map((game) => {
-      const field = fields.filter(f => f.id === game.playing_field)[0];
-      return (
-        <GameTile
-          key={game.id}
-          street={`ul. ${field.street}`}
-          date={game.date}
-          onPress={() => this.goToGameDetails(game, field)}
-        />
-      );
-    });
+    const gameTiles = games
+      .filter(game => game.players.includes(userId))
+      .map((game) => {
+        const field = fields.filter(f => f.id === game.playing_field)[0];
+        return (
+          <GameTile
+            key={game.id}
+            street={`ul. ${field.street}`}
+            date={game.date}
+            onPress={() => this.goToGameDetails(game, field)}
+          />
+        );
+      });
 
     return (
       <BackgroundImageScroll
@@ -97,10 +99,11 @@ export class EventsScreen extends Component {
 }
 
 const mapStateToProps = state => ({
-  usersGames: state.gameAPI.usersGames,
+  games: state.gameAPI.games,
   fields: state.gameAPI.fields,
   isFetchingGames: state.gameAPI.isUsersGamesFetching,
   username: state.user.username,
+  userId: state.user.userId,
 });
 
 // export default EventsScreen;
