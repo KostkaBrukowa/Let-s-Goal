@@ -6,6 +6,7 @@
     "react/forbid-prop-types": 0,
     "no-shadow": "off",
     "nonblock-statement-body-position": "off",
-    "no-new-wrappers": 0
+    "no-new-wrappers": 0,
+    "react/destructuring-assignment": 0
   }
 }

@@ -37,6 +37,13 @@ const styles = StyleSheet.create({
   },
 });
 
+const initialState = {
+  username: 'Alex',
+  password: 'password',
+  usernameError: '',
+  passwordError: '',
+};
+
 class LoginScreen extends Component {
   static navigationOptions = {
     header: null,
@@ -50,12 +57,7 @@ class LoginScreen extends Component {
     navigation: PropTypes.object.isRequired,
   };
 
-  state = {
-    username: 'Mark',
-    password: 'password',
-    usernameError: '',
-    passwordError: '',
-  };
+  state = initialState;
 
   componentDidUpdate = (prevProps) => {
     // checking for end of authentication process
@@ -68,6 +70,7 @@ class LoginScreen extends Component {
         this.makeAlert('Ups... Something went wrong', loginErrors.error);
       } else if (isAuthenticated) {
         const { navigation } = this.props;
+        this.setState(initialState);
         navigation.navigate('mainApp');
       }
     }

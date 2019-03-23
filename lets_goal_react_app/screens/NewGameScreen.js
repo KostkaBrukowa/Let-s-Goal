@@ -1,6 +1,8 @@
 /* eslint-disable react/require-default-props */
 import React, { Component } from 'react';
-import { StyleSheet, KeyboardAvoidingView, Text } from 'react-native';
+import {
+  StyleSheet, KeyboardAvoidingView, Text, Dimensions,
+} from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -68,15 +70,23 @@ export class NewGameScreen extends Component {
       date,
     };
     saveGame(game);
-    navigation.navigate('events');
+    navigation.navigate('eventsScreen');
+  };
+
+  scrollTo = (y) => {
+    this.scroll.scrollTo({ y, animated: true });
   };
 
   render() {
     const {
       name, playersNumber, pickName, pickPlayers,
     } = this.props;
+    const { height: windowHeight } = Dimensions.get('window');
     return (
-      <BackgroundImageScroll containerStyle={{ paddingBottom: '4%' }}>
+      <BackgroundImageScroll
+        scrollRef={scroll => (this.scroll = scroll)}
+        containerStyle={{ paddingBottom: '4%' }}
+      >
         <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
           <TextPicker
             value={name.value}
@@ -84,6 +94,7 @@ export class NewGameScreen extends Component {
             pickValue={pickName}
             title="Pick a name"
             icon="pencil"
+            onFocus={() => this.scrollTo(0)}
           />
           <FourDots />
           <TextPicker
@@ -94,6 +105,7 @@ export class NewGameScreen extends Component {
             icon="torsos-all"
             keyboardType="numeric"
             width={0.25}
+            onFocus={() => this.scrollTo(windowHeight * 0.29)}
           />
           <FourDots />
           <FieldPicker />

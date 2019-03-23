@@ -6,11 +6,13 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from .serializers import UserDetailsSerializer
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import mixins
 from .permissions import IsOwner
 from games.models import Game
+# import rest_auth
+from rest_auth.views import LoginView
 
 
 class UserDetailsViewSet(mixins.CreateModelMixin,
@@ -51,15 +53,8 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         user.details.save()
 
 
-class CustomAuthToken(ObtainAuthToken):
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data,
-                                           context={'request': request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.pk,
-        })
+class ExtraDetailsLoginView(LoginView):
+    def get_response(self):
+        data = super().get_response().data
+        data['user_id'] = self.user.id
+        return Response(data=data, status=status.HTTP_200_OK)

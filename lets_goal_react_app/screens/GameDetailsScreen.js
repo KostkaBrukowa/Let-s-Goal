@@ -16,6 +16,7 @@ import PlayerImageTile from '../components/gameDetails/PlayerImageTile';
 import DownButton from '../components/gameDetails/DownButton';
 import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
 import BackgroundImage from '../components/BackgroundImage';
+import VectorImageButton from '../components/ImageButton';
 
 const styles = StyleSheet.create({
   container: {
@@ -27,29 +28,16 @@ const styles = StyleSheet.create({
     height: 60,
     marginHorizontal: '2%',
   },
+  map: {
+    height: 0.53 * Dimensions.get('window').height,
+    width: Dimensions.get('window').width,
+    marginBottom: '3%',
+  },
 });
 
 // eslint-disable-next-line react/prefer-stateless-function
 class GameDetailsScreen extends React.Component {
-  // componentDidMount = () => {
-  //   this.getGame();
-  // }
-  // componentDidUpdate = (prevProps, prevState) => {
-  //   const { games } = this.props;
-  //   const { games: prevGames } = prevProps;
-  //   if(games !== prevGames) {
-  //     this.getGame()
-  //   }
-  // }
-
-  // getGame = () => {
-  //   const { games, navigation } = this.props
-  //   const {gameId} = navigation.getParam('gameId')
-
-  // }
-
   render() {
-    const { width, height } = Dimensions.get('window');
     const { games, fields, navigation } = this.props;
     const gameId = navigation.getParam('gameId');
     const game = games.find(game => game.id === gameId);
@@ -83,13 +71,11 @@ class GameDetailsScreen extends React.Component {
       longitudeDelta: 0.0421,
     };
 
-    const mapStyle = { height: 0.53 * height, width, marginBottom: '3%' };
-
     const playersTiles = players.map(player => <PlayerImageTile playerId={player} key={player} />);
 
     return (
       <BackgroundImageScroll containerStyle={{ paddingBottom: '4%' }}>
-        <MapView style={mapStyle} initialRegion={initialRegion}>
+        <MapView style={styles.map} initialRegion={initialRegion}>
           <Marker coordinate={{ longitude, latitude }} title={owner} />
         </MapView>
         <View style={[styles.container]}>

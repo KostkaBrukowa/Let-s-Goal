@@ -15,6 +15,15 @@ import { showGame } from '../redux/actions/appStateActions';
 import NavigationService from '../navigators/NavigationService';
 import EditButton from '../components/userDetails/EditButton';
 import NewGameTile from '../components/userDetails/NewGameTile';
+import VectorImageButton from '../components/ImageButton';
+import GameTilesContainer from '../components/eventsScreen/GameTilesContainer';
+
+function createGameTile(game, fields, onPress) {
+  const field = fields.filter(f => f.id === game.playing_field)[0];
+  return (
+    <GameTile key={game.id} street={`ul. ${field.street}`} date={game.date} onPress={onPress} />
+  );
+}
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -33,10 +42,16 @@ const styles = StyleSheet.create({
 });
 
 export class EventsScreen extends Component {
-  static navigationOptions = {
-    tabBarLabel: 'My events',
-    tabBarIcon: BottomNavIcon('md-calendar'),
-    title: 'My events',
+  static navigationOptions = ({ navigation }) => {
+    const userId = navigation.getParam('userId');
+    const onPress = userId && (() => navigation.push('userDetails', { userId }));
+
+    return {
+      tabBarLabel: 'My events',
+      tabBarIcon: BottomNavIcon('md-calendar'),
+      title: 'My events',
+      headerRight: <VectorImageButton iconName="user-circle" onPress={onPress} size={32} />,
+    };
   };
 
   static propTypes = {
@@ -50,7 +65,10 @@ export class EventsScreen extends Component {
   };
 
   componentDidMount = () => {
-    const { fetchUserGames, username } = this.props;
+    const {
+      fetchUserGames, username, navigation, userId,
+    } = this.props;
+    navigation.setParams({ userId });
     fetchUserGames(username);
   };
 
@@ -66,19 +84,13 @@ export class EventsScreen extends Component {
     // You haven't signed for any games yet. Click button below to add new one or go to Join
     // tab to join existing game.
 
-    const gameTiles = games
-      .filter(game => game.players.includes(userId))
-      .map((game) => {
-        const field = fields.filter(f => f.id === game.playing_field)[0];
-        return (
-          <GameTile
-            key={game.id}
-            street={`ul. ${field.street}`}
-            date={game.date}
-            onPress={() => this.goToGameDetails(game, field)}
-          />
-        );
-      });
+    const createdGameTiles = games
+      .filter(game => game.owner === userId)
+      .map(game => createGameTile(game, fields, () => this.goToGameDetails(game)));
+
+    const joinedGameTiles = games
+      .filter(game => game.owner !== userId && game.players.includes(userId))
+      .map(game => createGameTile(game, fields, () => this.goToGameDetails(game)));
 
     return (
       <BackgroundImageScroll
@@ -87,11 +99,15 @@ export class EventsScreen extends Component {
         isLoading={isFetchingGames}
       >
         <View style={[{ paddingRight: '5%', paddingLeft: '5%' }, styles.container]}>
-          <Text style={styles.title}>My events</Text>
-          <ScrollView horizontal>
-            {gameTiles}
-            <NewGameTile />
-          </ScrollView>
+          {createdGameTiles.length !== 0 && (
+            <GameTilesContainer title="My events">
+              {createdGameTiles}
+              <NewGameTile />
+            </GameTilesContainer>
+          )}
+          {joinedGameTiles.length !== 0 && (
+            <GameTilesContainer title="Joined events">{joinedGameTiles}</GameTilesContainer>
+          )}
         </View>
       </BackgroundImageScroll>
     );

@@ -12,7 +12,7 @@ export const AppNavigator = createBottomTabNavigator(
     events: MyEventsNavigator,
   },
   {
-    initialRouteName: 'joinGame',
+    initialRouteName: 'events',
     tabBarOptions: {
       activeTintColor: 'white',
       inactiveTintColor: BOTTOM_ICON_COLOR_UF,

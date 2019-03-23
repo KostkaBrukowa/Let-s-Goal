@@ -28,7 +28,7 @@ function DownButton(props) {
   } else if (isInGame) {
     const { removePlayerFromGame, username } = props;
     title = 'Leave the game';
-    onPress = () => removePlayerFromGame(username);
+    onPress = () => removePlayerFromGame(username, gameId);
   } else {
     title = 'Join the game';
     onPress = () => props.joinGame(gameId);

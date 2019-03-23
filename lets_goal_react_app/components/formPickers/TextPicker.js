@@ -28,6 +28,7 @@ export default class NumberPicker extends Component {
     keyboardType: 'default',
     title: '',
     width: 0.75,
+    onFocus: () => {},
   };
 
   static propTypes = {
@@ -38,6 +39,7 @@ export default class NumberPicker extends Component {
     title: PropTypes.string,
     icon: PropTypes.string.isRequired,
     width: PropTypes.number,
+    onFocus: PropTypes.func,
   };
 
   state = {
@@ -49,6 +51,12 @@ export default class NumberPicker extends Component {
     if (prevProps.value !== value && value && !errors) {
       this.setState({ isTextInputVisible: false });
     }
+
+    // const { isTextInputVisible } = this.state;
+    // const { isTextInputVisible: prevIsTextInputVisible } = prevProps;
+    // if (isTextInputVisible !== prevIsTextInputVisible && isTextInputVisible) {
+    //   this.props.onFocus();
+    // }
   };
 
   toggleInput = () => {
@@ -60,7 +68,7 @@ export default class NumberPicker extends Component {
   render() {
     const { isTextInputVisible } = this.state;
     const {
-      value, errors, pickValue, title, icon, keyboardType, width,
+      value, errors, pickValue, title, icon, keyboardType, width, onFocus,
     } = this.props;
     const isSelected = value != null && errors == null;
     return (
@@ -79,6 +87,7 @@ export default class NumberPicker extends Component {
             keyboardType={keyboardType}
             isTextInputVisible={isTextInputVisible}
             onBlur={pickValue}
+            onFocus={onFocus}
             widthPart={width}
           />
         </View>

@@ -20,8 +20,7 @@ export const saveGame = form => async (dispatch, getState) => {
     const urlFriendlyData = caseConverter.toSnakeCase(form);
     const options = {
       method: 'POST',
-      //   body: JSON.stringify(urlFriendlyData),
-      body: urlFriendlyData,
+      body: JSON.stringify(urlFriendlyData),
       ...tokenConfig(getState),
     };
 
@@ -34,7 +33,8 @@ export const saveGame = form => async (dispatch, getState) => {
 
     const newGame = await response.json();
 
-    dispatch({ type: NEW_GAME_FORM_SUBIMT_SUCCESS, payload: newGame });
+    dispatch({ type: NEW_GAME_FORM_SUBIMT_SUCCESS });
+    dispatch({ type: LIST_GAMES, payload: [newGame] });
   } catch (e) {
     dispatch({ type: NEW_GAME_FORM_FAIL, payload: e.message });
   }
@@ -67,8 +67,8 @@ export const joinGame = gameId => async (dispatch, getState) => {
 export const removePlayerFromGame = (username, gameId) => async (dispatch, getState) => {
   dispatch({ type: REMOVING_PLAYER });
   try {
-    const config = { ...tokenConfig(getState), body: { username } };
-    const url = `${BASE_URL}/games/${gameId}/remove_player/`;
+    const config = { ...tokenConfig(getState), body: JSON.stringify({ username }), method: 'PUT' };
+    const url = `${BASE_URL}games/${gameId}/remove_player/`;
     const response = await timeout(10000, fetch(url, config));
 
     if (!response.ok) {
@@ -84,5 +84,6 @@ export const removePlayerFromGame = (username, gameId) => async (dispatch, getSt
     if (e instanceof TimeoutError) {
       dispatch({ type: REMOVE_PLAYER_FAIL, payload: 'Could not connect to a server' });
     } else dispatch({ type: REMOVE_PLAYER_FAIL, payload: e.message });
+    console.log(e.message);
   }
 };

@@ -1,28 +1,21 @@
 import React, { Component } from 'react';
 import {
-  View,
-  ToastAndroid,
-  Image,
-  StyleSheet,
-  Dimensions,
-  Button,
-  Animated,
-  KeyboardAvoidingView,
+  View, ToastAndroid, Image, StyleSheet, Dimensions, Animated,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Header } from 'react-navigation';
 
-import { getUserDetails, clearUserDetailFetchError } from '../redux/actions/appStateActions';
-import { PURPLE_APP_TINT } from '../const/const';
+import { getUserDetails } from '../redux/actions/appStateActions';
+import { signOut } from '../redux/actions/authActions';
 import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
 import BackgroundImage from '../components/BackgroundImage';
 import DescriptionRow from '../components/gameDetails/DescriptionRow';
 import Title from '../components/gameDetails/Title';
 import appStyle from '../const/globalStyles';
 import GamesCountRow from '../components/userDetails/GamesCount';
-import NavigationService from '../navigators/NavigationService';
 import EditButton from '../components/userDetails/EditButton';
+import VectorImageButton from '../components/ImageButton';
 
 const profileImageSide = 170;
 
@@ -41,7 +34,7 @@ const styles = StyleSheet.create({
   },
   lowerContainer: {
     ...appStyle.container,
-    flex: 10,
+    flex: 14,
     justifyContent: 'space-evenly',
     marginBottom: '13%',
   },
@@ -51,9 +44,16 @@ const styles = StyleSheet.create({
 class UserDetailsScreen extends Component {
   static navigationOptions = ({ navigation }) => {
     const title = navigation.getParam('title');
+    const isCurrentUser = navigation.getParam('isCurrentUser');
+    const signOut = navigation.getParam('signOut');
+
+    const headerRight = isCurrentUser && (
+      <VectorImageButton iconName="sign-out" onPress={signOut} />
+    );
 
     return {
       title: title || '',
+      headerRight,
     };
   };
 
@@ -69,7 +69,6 @@ class UserDetailsScreen extends Component {
     users: PropTypes.array.isRequired,
     navigation: PropTypes.object.isRequired,
     fetchingError: PropTypes.instanceOf(String),
-    cleanError: PropTypes.func.isRequired,
     username: PropTypes.string.isRequired,
   };
 
@@ -91,12 +90,13 @@ class UserDetailsScreen extends Component {
     const { users } = this.props;
     const { users: prevUsers } = prevProps;
     if (users !== prevUsers) {
-      const { navigation, username } = this.props;
+      const { navigation, username, signOut } = this.props;
       const userId = navigation.getParam('userId');
       const user = users.find(user => user.id === userId);
 
-      const title = username === user.username ? 'Your profile' : user.username;
-      navigation.setParams({ title });
+      const isCurrentUser = username === user.username;
+      const title = isCurrentUser ? 'Your profile' : user.username;
+      navigation.setParams({ title, isCurrentUser, signOut });
       this.setState({ user });
     }
   };
@@ -111,20 +111,32 @@ class UserDetailsScreen extends Component {
     });
   };
 
+  interpolateAnimated = ({ outRange }) => this.state.animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: outRange,
+  });
+
+  editObject = fieldName => ({
+    editMode: this.state.editMode,
+    onChangeText: value => this.setState(state => ({
+      user: {
+        ...state.user,
+        [fieldName]: value,
+      },
+    })),
+  });
+
   render() {
     const { fetchingUserDetails, username } = this.props;
-    const { user, animatedValue, editMode } = this.state;
-    const height = Dimensions.get('screen').height - 2 * Header.HEIGHT;
+    const { user, editMode } = this.state;
+    const { height: screenHeight } = Dimensions.get('screen');
+    const height = screenHeight - 2 * Header.HEIGHT;
 
     const profileImage = require('../assets/images/no-image-profile.png');
-    const upperFlex = animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [11, 4],
-    });
-    const upperOpacity = animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 0.15],
-    });
+    const upperOpacity = this.interpolateAnimated({ outRange: [1, 0.15] });
+    const yTransformUpper = this.interpolateAnimated({ outRange: [0, 0.32 * screenHeight] });
+    const yTransformLower = this.interpolateAnimated({ outRange: [0, -0.32 * screenHeight] });
+    const scaleTranform = this.interpolateAnimated({ outRange: [1, 1.08] });
 
     if (fetchingUserDetails || !user) {
       return (
@@ -137,7 +149,10 @@ class UserDetailsScreen extends Component {
       <BackgroundImage dim stackHeader>
         <View style={[{ height, width: '100%' }, appStyle.container]}>
           <Animated.View
-            style={[styles.upperContainer, { flex: upperFlex, opacity: upperOpacity }]}
+            style={[
+              styles.upperContainer,
+              { transform: [{ translateY: yTransformUpper }], opacity: upperOpacity },
+            ]}
           >
             <Image style={styles.profileImage} source={profileImage} />
             <Title title={user.username} containerStyle={styles.titleStyle} />
@@ -148,26 +163,51 @@ class UserDetailsScreen extends Component {
               countRight={user.joinedEventsNumber}
             />
           </Animated.View>
-          <KeyboardAvoidingView
-            style={[styles.lowerContainer]}
-            behavior="padding"
-            enabled={editMode}
+          <Animated.View
+            style={[
+              styles.lowerContainer,
+              {
+                transform: [
+                  { translateY: yTransformLower },
+                  { scaleX: scaleTranform },
+                  { scaleY: scaleTranform },
+                ],
+              },
+            ]}
           >
             <Title title="Profile details" containerStyle={styles.titleStyle} />
             <DescriptionRow
-              leftText="First and last name:"
-              rightText={`${user.firstName || ''} ${user.lastName || ''}`}
+              leftText="First name:"
+              rightText={`${user.firstName || ''}`}
+              {...this.editObject('firstName')}
             />
-            <DescriptionRow leftText="Birth Date:" rightText={user.birthDate || ''} />
+            <DescriptionRow
+              leftText="Last name:"
+              rightText={`${user.lastName || ''}`}
+              {...this.editObject('lastName')}
+            />
+            <DescriptionRow
+              leftText="Birth Date:"
+              rightText={user.birthDate || ''}
+              {...this.editObject('birthDate')}
+            />
             <DescriptionRow leftText="E-mail address:" rightText={user.email || ''} />
-            <DescriptionRow leftText="Address:" rightText={user.address || ''} />
-            <DescriptionRow leftText="Prefered position:" rightText={user.preferedPosition} />
+            <DescriptionRow
+              leftText="Address:"
+              rightText={user.address || ''}
+              {...this.editObject('address')}
+            />
+            <DescriptionRow
+              leftText="Prefered position:"
+              rightText={user.preferedPosition}
+              {...this.editObject('preferedPosition')}
+            />
             <EditButton
               editMode={editMode}
               visible={user.username === username}
               onPress={this.toggleEditMode}
             />
-          </KeyboardAvoidingView>
+          </Animated.View>
         </View>
       </BackgroundImage>
     );
@@ -179,9 +219,10 @@ const mapStateToProps = state => ({
   fetchingUserDetails: state.appState.fetchingUserDetails,
   fetchingError: state.appState.fetchingError,
   username: state.user.username,
+  userId: state.user.userId,
 });
 
 export default connect(
   mapStateToProps,
-  { getUserDetails, cleanError: clearUserDetailFetchError },
+  { getUserDetails, signOut },
 )(UserDetailsScreen);

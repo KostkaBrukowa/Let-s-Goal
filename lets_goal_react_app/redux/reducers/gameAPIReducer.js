@@ -25,11 +25,11 @@ export const apiDefaultState = {
 
 export default function (state = apiDefaultState, action) {
   switch (action.type) {
-    case NEW_GAME_FORM_SUBIMT_SUCCESS:
-      return {
-        ...state,
-        usersGames: [...state.usersGames, action.payload],
-      };
+    // case NEW_GAME_FORM_SUBIMT_SUCCESS:
+    //   return {
+    //     ...state,
+    //     usersGames: [...state.usersGames, action.payload],
+    //   };
     case FETCHING_USERS_GAMES:
       return {
         ...state,

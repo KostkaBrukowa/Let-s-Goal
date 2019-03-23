@@ -122,7 +122,6 @@ class GamesTests(APITestCase):
         '''
         self.game2.players.add(User.objects.get(pk=1))
 
-        print(self.game2)
         response = self.client.put(
             '/games/2/remove_player/',
             data={'username': 'Alex'},

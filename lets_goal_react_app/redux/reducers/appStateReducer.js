@@ -5,7 +5,9 @@ import {
   FETCHING_USER_DETAILS_FAILED,
   FETCHING_USER_DETAILS,
   LOCATION,
-  CLEAR_ERROR,
+  UPDATE_USER_DETAIL_FAIL,
+  UPDATE_USER_DETAIL_SUCCESS,
+  UPDATING_USER_DETAILS,
 } from '../actions/types';
 import { uniqueObjects } from '../../const/commonForReducers';
 
@@ -15,6 +17,8 @@ const defaultState = {
   users: [],
   fetchingUserDetails: false,
   fetchingError: null,
+  updatingUserDetails: false,
+  updatingUserDetailsError: null,
   location: null,
 };
 
@@ -50,6 +54,25 @@ export default function (state = defaultState, action) {
         ...state,
         location: action.payload,
       };
+    case UPDATING_USER_DETAILS:
+      return {
+        ...state,
+        updatingUserDetails: true,
+        updatingUserDetailsError: null,
+      };
+    case UPDATE_USER_DETAIL_SUCCESS:
+      return {
+        ...state,
+        updatingUserDetails: false,
+        updatingUserDetailsError: null,
+      };
+    case UPDATE_USER_DETAIL_FAIL:
+      return {
+        ...state,
+        updatingUserDetails: false,
+        updatingUserDetailsError: action.payload,
+      };
+
     default:
       return state;
   }

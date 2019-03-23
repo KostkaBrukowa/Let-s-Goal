@@ -14,8 +14,13 @@ import { fetchNearGames } from '../redux/actions/gameAPIActions';
 import { showGame, fetchLocation } from '../redux/actions/appStateActions';
 import InfoTile from '../components/JoinScreen/InfoTile';
 import NavigationService from '../navigators/NavigationService';
+import appStyle from '../const/globalStyles';
 
 const styles = StyleSheet.create({
+  headerTitle: {
+    ...appStyle.bigTitle,
+    margin: '3%',
+  },
   scrollContainer: {
     height: '100%',
     justifyContent: 'center',
@@ -72,9 +77,9 @@ export class JoinScreen extends Component {
     }
   };
 
-  fetchGames = (location) => {
-    const { fetchNearGames, location: reduxLocation } = this.props;
-    fetchNearGames(location || reduxLocation);
+  fetchGames = () => {
+    const { fetchNearGames, location } = this.props;
+    location && fetchNearGames(location);
   };
 
   goToGameDetails = (game) => {
@@ -96,7 +101,7 @@ export class JoinScreen extends Component {
     } = this.props;
     const { visibleTileSet } = this.state;
     const gameTiles = nearGames
-      .filter(game => game.owner !== userId)
+      .filter(game => !game.players.includes(userId))
       .map((game) => {
         const field = fields.filter(f => f.id === game.playing_field)[0];
         return (
@@ -116,11 +121,17 @@ export class JoinScreen extends Component {
     return (
       <BackgroundImageScroll
         isLoading={isFetchingGames}
-        onRefresh={() => {}}
+        onRefresh={this.fetchGames}
         containerStyle={styles.scrollContainer}
       >
-        <Text style={{ fontSize: 20, color: 'white', margin: '3%' }}>Near Events</Text>
-        <View style={styles.tilesContainerStyle}>{gameTiles}</View>
+        <Text style={styles.headerTitle}>Near Events</Text>
+        {gameTiles.length === 0 ? (
+          <Text style={[appStyle.smallTitle, { color: 'lightgray' }]}>
+            Ups... there are no around you
+          </Text>
+        ) : (
+          <View style={styles.tilesContainerStyle}>{gameTiles}</View>
+        )}
       </BackgroundImageScroll>
     );
   }

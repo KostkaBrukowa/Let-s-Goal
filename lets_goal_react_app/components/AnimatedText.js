@@ -24,6 +24,7 @@ export default class AnimatedText extends Component {
   static propTypes = {
     isTextInputVisible: PropTypes.bool.isRequired,
     onBlur: PropTypes.func.isRequired,
+    onFocus: PropTypes.func.isRequired,
     keyboardType: PropTypes.string,
     widthPart: PropTypes.number,
   };
@@ -84,7 +85,7 @@ export default class AnimatedText extends Component {
   render() {
     const { isAnimationRunning, value } = this.state;
     const {
-      isTextInputVisible, onBlur, keyboardType, widthPart,
+      isTextInputVisible, onBlur, onFocus, keyboardType, widthPart,
     } = this.props;
     const { width } = Dimensions.get('window');
     const interpolatedStyle = {
@@ -100,6 +101,7 @@ export default class AnimatedText extends Component {
           <AnimatedTextInput
             ref={this.textInput}
             onBlur={() => onBlur(value)}
+            onFocus={onFocus}
             placeholder={!isTextInputVisible ? '' : ''}
             value={!isTextInputVisible ? '' : value}
             onChangeText={value => this.setState({ value })}
