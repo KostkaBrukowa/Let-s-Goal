@@ -5,10 +5,19 @@ import {
   REGISTER_SUCCESS,
   REGISTER_FAIL,
   USER_DETAILS,
+  SIGN_OUT,
 } from '../actions/types';
 
+// username: null,
+// token: null,
+// userId: null,
+// token: action.payload.token,
+// username: action.payload.username,
+// userId: action.payload.userId,
 const defaultState = {
-  token: '6dd0f3e70b8c1c77209bf844276cd43464cb3b25',
+  username: 'Mark',
+  token: '362f17711de6c953fe126e8bf5276c566003ae2b',
+  userId: 2,
   isAuthenticated: false,
   isBeingAuthenticated: false,
   loginErrors: null,
@@ -22,6 +31,8 @@ export default function (state = defaultState, action) {
       return {
         ...state,
         token: action.payload.token,
+        username: action.payload.username,
+        userId: action.payload.userId,
         isAuthenticated: true,
         isBeingAuthenticated: false,
         loginErrors: null,
@@ -45,6 +56,8 @@ export default function (state = defaultState, action) {
         ...state,
         isBeingAuthenticated: true,
       };
+    case SIGN_OUT:
+      return defaultState;
     default:
       return state;
   }

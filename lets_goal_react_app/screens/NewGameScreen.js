@@ -1,17 +1,15 @@
 /* eslint-disable react/require-default-props */
 import React, { Component } from 'react';
 import {
-  StyleSheet,
-  KeyboardAvoidingView,
-  Text,
+  StyleSheet, KeyboardAvoidingView, Text, Dimensions,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import BackgroundImageScroll from '../components/BackGroundImageScroll'
+import BackgroundImageScroll from '../components/BackGroundImageScroll';
 import DateTimePicker from '../components/formPickers/DateTime';
 import { pickName, pickPlayers, pickField } from '../redux/actions/gameFormActions';
-import { saveGame } from '../redux/actions/gameAPIActions';
+import { saveGame } from '../redux/actions/gameManagerActions';
 import FourDots from '../components/FourDots';
 import TextPicker from '../components/formPickers/TextPicker';
 import FieldPicker from '../components/formPickers/FieldPicker';
@@ -32,7 +30,7 @@ const styles = StyleSheet.create({
 
 export class NewGameScreen extends Component {
   static navigationOptions = {
-    headerRight: <Text>fdlfladsjk</Text>,
+    headerRight: <Text>New game screen</Text>,
   };
 
   static navigationOptions = ({ navigation }) => {
@@ -62,7 +60,7 @@ export class NewGameScreen extends Component {
 
   submit = () => {
     const {
-      name, playersNumber, playingField, date, saveGame,
+      name, playersNumber, playingField, date, saveGame, navigation,
     } = this.props;
 
     const game = {
@@ -72,14 +70,21 @@ export class NewGameScreen extends Component {
       date,
     };
     saveGame(game);
+    navigation.navigate('eventsScreen');
+  };
+
+  scrollTo = (y) => {
+    this.scroll.scrollTo({ y, animated: true });
   };
 
   render() {
     const {
-      name, playersNumber, pickName, pickPlayers, navigation,
+      name, playersNumber, pickName, pickPlayers,
     } = this.props;
+    const { height: windowHeight } = Dimensions.get('window');
     return (
       <BackgroundImageScroll
+        scrollRef={scroll => (this.scroll = scroll)}
         containerStyle={{ paddingBottom: '4%' }}
       >
         <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
@@ -89,6 +94,7 @@ export class NewGameScreen extends Component {
             pickValue={pickName}
             title="Pick a name"
             icon="pencil"
+            onFocus={() => this.scrollTo(0)}
           />
           <FourDots />
           <TextPicker
@@ -99,13 +105,12 @@ export class NewGameScreen extends Component {
             icon="torsos-all"
             keyboardType="numeric"
             width={0.25}
+            onFocus={() => this.scrollTo(windowHeight * 0.29)}
           />
           <FourDots />
-          <FieldPicker navigation={navigation} />
+          <FieldPicker />
           <FourDots />
-
           <DateTimePicker />
-          {/* <Button onPress={this.submit} title="submit" /> */}
         </KeyboardAvoidingView>
       </BackgroundImageScroll>
     );

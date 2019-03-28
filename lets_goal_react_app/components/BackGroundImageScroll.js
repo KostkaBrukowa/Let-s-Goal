@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
 
 const BackgroundImageScroll = (props) => {
   const {
-    children, containerStyle, source, onRefresh, isLoading,
+    children, containerStyle, source, onRefresh, isLoading, scrollRef,
   } = props;
   const { width, height } = Dimensions.get('window');
   return (
@@ -34,6 +34,7 @@ const BackgroundImageScroll = (props) => {
       style={styles.scrollStyle}
       contentContainerStyle={[styles.container, containerStyle]}
       refreshControl={onRefresh && <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+      ref={scrollRef}
     >
       <View style={{ width: '100%', height: '100%' }}>
         <ImageBackground

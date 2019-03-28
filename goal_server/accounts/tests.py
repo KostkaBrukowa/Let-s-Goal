@@ -91,3 +91,28 @@ class UserDetailsTests(APITestCase):
         user = User.objects.get(pk=1)
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(user.details.joined_events_number, 1)
+
+    def test_remove_game(self):
+        '''test if all user details are updated afted removing a game'''
+        game = create_game("test_game", players=[
+            1, 2], owner=User.objects.get(pk=1))
+        print(game.players.first())
+        owner = User.objects.get(pk=1).details
+        joinee = User.objects.get(pk=2).details
+        prev_owner_created_count = owner.created_events_number
+        prev_owner_joined_count = owner.joined_events_number
+        prev_joinee_created_count = joinee.created_events_number
+        prev_joinee_joined_count = joinee.joined_events_number
+
+        Game.objects.get(pk=1).delete()
+
+        owner = User.objects.get(pk=1).details
+        joinee = User.objects.get(pk=2).details
+        self.assertEqual(owner.created_events_number,
+                         prev_owner_created_count - 1)
+        self.assertEqual(owner.joined_events_number,
+                         prev_owner_joined_count)
+        self.assertEqual(joinee.created_events_number,
+                         prev_joinee_created_count)
+        self.assertEqual(joinee.joined_events_number,
+                         prev_joinee_joined_count - 1)

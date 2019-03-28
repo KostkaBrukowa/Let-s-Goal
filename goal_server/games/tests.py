@@ -33,7 +33,6 @@ class GamesTests(APITestCase):
         User.objects.create_user('Alex', 'alex@gmail.com', 'password')
         User.objects.create_user('Mark', 'floy1980@hotmail.com', 'password')
         User.objects.create_user('Henry', 'fannie1994@gmail.com', 'password')
-        # User.objects.create_user('Mike', 'rosella1991@hotmail.com', 'password')
 
         fields = [(10, 10, 'Koszykowa'),
                   (20, 20, 'Wilcza'),
@@ -43,8 +42,6 @@ class GamesTests(APITestCase):
             street=fields[0][2], owner='MOSIR', latitude=fields[0][0], longitude=fields[0][1], price_per_hour=100)
         field2 = Playing_Field.objects.create(
             street=fields[1][2], owner='MOSIR', latitude=fields[1][0], longitude=fields[1][1], price_per_hour=110)
-        # field3 = Playing_Field.objects.create(
-        #     street=fields[2][2], owner='MOSIR', latitude=fields[2][0], longitude=fields[2][1], price_per_hour=120)
 
         self.game1 = create_game(
             name='game1', players_number=1, playing_field=self.field1)
@@ -80,7 +77,7 @@ class GamesTests(APITestCase):
         self.assertEqual(response.data['owner'], 1)
         self.assertEqual(response.data['players'], [1, ])
 
-    def test_update_game(self):
+    def test_join_game(self):
         '''
         testing simple addition of player to a game
         '''

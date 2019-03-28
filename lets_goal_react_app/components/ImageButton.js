@@ -5,27 +5,27 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { BOTTOM_ICON_SIZE } from '../const/const';
 
-function ImageButton({
+function VectorImageButton({
   onPress, iconName, size, color,
 }) {
   return (
-    <TouchableOpacity onPress={onPress} style={{ marginRight: 10 }}>
+    <TouchableOpacity onPress={onPress} style={{ margin: 10 }}>
       <Icon name={iconName} size={size} color={color} />
     </TouchableOpacity>
   );
 }
 
-ImageButton.propTypes = {
+VectorImageButton.propTypes = {
   onPress: PropTypes.func,
   iconName: PropTypes.string.isRequired,
   size: PropTypes.number,
   color: PropTypes.string,
 };
 
-ImageButton.defaultProps = {
+VectorImageButton.defaultProps = {
   onPress: () => {},
   size: BOTTOM_ICON_SIZE,
   color: 'white',
 };
 
-export default ImageButton;
+export default VectorImageButton;

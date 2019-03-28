@@ -37,6 +37,13 @@ const styles = StyleSheet.create({
   },
 });
 
+const initialState = {
+  username: 'Alex',
+  password: 'password',
+  usernameError: '',
+  passwordError: '',
+};
+
 class LoginScreen extends Component {
   static navigationOptions = {
     header: null,
@@ -50,12 +57,7 @@ class LoginScreen extends Component {
     navigation: PropTypes.object.isRequired,
   };
 
-  state = {
-    username: 'Alex',
-    password: 'password',
-    usernameError: '',
-    passwordError: '',
-  };
+  state = initialState;
 
   componentDidUpdate = (prevProps) => {
     // checking for end of authentication process
@@ -68,6 +70,7 @@ class LoginScreen extends Component {
         this.makeAlert('Ups... Something went wrong', loginErrors.error);
       } else if (isAuthenticated) {
         const { navigation } = this.props;
+        this.setState(initialState);
         navigation.navigate('mainApp');
       }
     }
@@ -121,7 +124,7 @@ class LoginScreen extends Component {
               color={PURPLE_APP_TINT}
             />
           ) : (
-            <ActivityIndicator size={46} style={{ marginTop: 30 }} color={PURPLE_APP_TINT} />
+            <ActivityIndicator size={46} style={{ marginTop: 30 }} color="white" />
           )}
 
           <DescriptionWithLink

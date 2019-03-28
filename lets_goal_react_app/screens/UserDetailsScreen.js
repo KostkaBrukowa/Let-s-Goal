@@ -1,27 +1,25 @@
 import React, { Component } from 'react';
 import {
-  View,
-  Image,
-  StyleSheet,
-  Dimensions,
-  Button,
-  Animated,
-  KeyboardAvoidingView,
+  View, ToastAndroid, Image, StyleSheet, Dimensions, Animated, Text,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Header } from 'react-navigation';
 
 import { getUserDetails } from '../redux/actions/appStateActions';
-import { PURPLE_APP_TINT } from '../const/const';
+import { signOut } from '../redux/actions/authActions';
 import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
 import BackgroundImage from '../components/BackgroundImage';
 import DescriptionRow from '../components/gameDetails/DescriptionRow';
 import Title from '../components/gameDetails/Title';
 import appStyle from '../const/globalStyles';
 import GamesCountRow from '../components/userDetails/GamesCount';
+import EditButton from '../components/userDetails/EditButton';
+import VectorImageButton from '../components/ImageButton';
+import OnOfTransformView from '../components/userDetails/OnOfTransformView';
 
 const profileImageSide = 170;
+const animationDuration = 600;
 
 const styles = StyleSheet.create({
   profileImage: {
@@ -38,7 +36,7 @@ const styles = StyleSheet.create({
   },
   lowerContainer: {
     ...appStyle.container,
-    flex: 10,
+    flex: 14,
     justifyContent: 'space-evenly',
     marginBottom: '13%',
   },
@@ -47,114 +45,160 @@ const styles = StyleSheet.create({
 
 class UserDetailsScreen extends Component {
   static navigationOptions = ({ navigation }) => {
-    const username = navigation.getParam('username');
+    const title = navigation.getParam('title');
+    const isCurrentUser = navigation.getParam('isCurrentUser');
+    const signOut = navigation.getParam('signOut');
+
+    const headerRight = isCurrentUser && (
+      <VectorImageButton iconName="sign-out" onPress={signOut} />
+    );
 
     return {
-      title: username || '',
+      title: title || '',
+      headerRight,
     };
   };
 
   state = {
     user: null,
     editMode: false,
-    animatedValue: new Animated.Value(0),
+    positionFlipped: false,
   };
 
   static propTypes = {
     fetchingUserDetails: PropTypes.bool.isRequired,
     getUserDetails: PropTypes.func.isRequired,
-    users: PropTypes.array.isRequired,
+    signOut: PropTypes.func.isRequired,
+    user: PropTypes.object,
     navigation: PropTypes.object.isRequired,
+    fetchingError: PropTypes.instanceOf(String),
+    username: PropTypes.string.isRequired,
   };
 
   componentDidMount = () => {
     const { navigation, getUserDetails } = this.props;
     const userId = navigation.getParam('userId');
+    // debugger;
     if (userId) getUserDetails(userId);
   };
 
-  componentDidUpdate = (prevProps, prevState) => {
-    const { users } = this.props;
-    const { users: prevUsers } = prevProps;
-    if (users !== prevUsers) {
+  componentDidUpdate = (prevProps) => {
+    const { fetchingError } = this.props;
+    const { fetchingError: prevFetchingError } = prevProps;
+    if (fetchingError !== prevFetchingError) {
       const { navigation } = this.props;
+      ToastAndroid.show('Could not connect to a sever', ToastAndroid.SHORT);
+      navigation.goBack();
+    }
+
+    const { user } = this.props;
+    const { user: prevUser } = prevProps;
+    if (user !== prevUser) {
+      const { navigation, username, signOut } = this.props;
       const userId = navigation.getParam('userId');
-      const user = users.find(user => user.id === userId);
+      if (user.id !== userId) return;
+
+      const isCurrentUser = user && username === user.username;
+      const title = isCurrentUser ? 'Your profile' : user.username;
+      navigation.setParams({ title, isCurrentUser, signOut });
       this.setState({ user });
     }
   };
 
   toggleEditMode = () => {
-    const { animatedValue, editMode } = this.state;
-    Animated.timing(animatedValue, {
-      toValue: editMode ? 0 : 1,
-      duration: 300,
-    }).start(() => {
-      this.setState({ editMode: !editMode });
-    });
+    this.setState(state => ({ positionFlipped: !state.positionFlipped }));
+    setTimeout(
+      () => this.setState(state => ({ editMode: !state.editMode })),
+      animationDuration + 100,
+    );
   };
 
+  editObject = fieldName => ({
+    editMode: this.state.editMode,
+    onChangeText: value => this.setState(state => ({
+      user: {
+        ...state.user,
+        [fieldName]: value,
+      },
+    })),
+  });
+
   render() {
-    const { fetchingUserDetails } = this.props;
-    const { user, animatedValue, editMode } = this.state;
-    const height = Dimensions.get('screen').height - 2 * Header.HEIGHT;
+    const { fetchingUserDetails, username } = this.props;
+    const { user, editMode, positionFlipped } = this.state;
+    const { height: screenHeight } = Dimensions.get('screen');
+    const height = screenHeight - 2 * Header.HEIGHT;
 
     const profileImage = require('../assets/images/no-image-profile.png');
-    const upperFlex = animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [11, 4],
-    });
-    const upperOpacity = animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 0.15],
-    });
-
     if (fetchingUserDetails || !user) {
       return (
-        <BackgroundImage dim>
+        <BackgroundImage dim stackHeader>
           <FullScreenActivityIndicator color="white" />
         </BackgroundImage>
       );
     }
     return (
-      <BackgroundImage dim>
+      <BackgroundImage dim stackHeader>
         <View style={[{ height, width: '100%' }, appStyle.container]}>
-          <Animated.View
-            style={[styles.upperContainer, { flex: upperFlex, opacity: upperOpacity }]}
+          <OnOfTransformView
+            transformOn={positionFlipped}
+            transformRange={[{ translateY: [0, 0.32 * screenHeight] }]}
+            opacity={[1, 0.15]}
+            duration={animationDuration}
+            style={styles.upperContainer}
           >
             <Image style={styles.profileImage} source={profileImage} />
             <Title title={user.username} containerStyle={styles.titleStyle} />
             <GamesCountRow
               descriptionLeft="created games"
-              countLeft={user.created_events_number}
+              countLeft={user.createdEventsNumber}
               descriptionRight="joined games"
-              countRight={user.joined_events_number}
+              countRight={user.joinedEventsNumber}
             />
-          </Animated.View>
-          <KeyboardAvoidingView
-            style={[styles.lowerContainer]}
-            behavior="padding"
-            enabled={editMode}
+          </OnOfTransformView>
+          <OnOfTransformView
+            transformOn={positionFlipped}
+            transformRange={[
+              { translateY: [0, -0.32 * screenHeight] },
+              { scaleX: [1, 1.08] },
+              { scaleY: [1, 1.08] },
+            ]}
+            duration={animationDuration}
+            style={styles.lowerContainer}
           >
             <Title title="Profile details" containerStyle={styles.titleStyle} />
             <DescriptionRow
-              leftText="First and last name:"
-              rightText={`${user.first_name || ''} ${user.last_name || ''}`}
+              leftText="First name:"
+              rightText={`${user.firstName || ''}`}
+              {...this.editObject('firstName')}
             />
-            <DescriptionRow leftText="Birth Date:" rightText={user.birth_date || ''} />
+            <DescriptionRow
+              leftText="Last name:"
+              rightText={`${user.lastName || ''}`}
+              {...this.editObject('lastName')}
+            />
+            <DescriptionRow
+              leftText="Birth Date:"
+              rightText={user.birthDate || ''}
+              {...this.editObject('birthDate')}
+            />
             <DescriptionRow leftText="E-mail address:" rightText={user.email || ''} />
-            <DescriptionRow leftText="Address:" rightText={user.address || ''} />
-            <DescriptionRow leftText="Prefered position:" rightText={user.prefered_position} />
-            <View style={styles.button}>
-              <Button
-                title={editMode ? 'Save' : 'Edit'}
-                onPress={() => {
-                  this.toggleEditMode();
-                }}
-                color={PURPLE_APP_TINT}
-              />
-            </View>
-          </KeyboardAvoidingView>
+            <DescriptionRow
+              leftText="Address:"
+              rightText={user.address || ''}
+              {...this.editObject('address')}
+            />
+            <DescriptionRow
+              leftText="Prefered position:"
+              rightText={user.preferedPosition}
+              {...this.editObject('preferedPosition')}
+            />
+            <EditButton
+              editMode={editMode}
+              visible={user.username === username}
+              onPress={this.toggleEditMode}
+            />
+          </OnOfTransformView>
         </View>
       </BackgroundImage>
     );
@@ -162,11 +206,14 @@ class UserDetailsScreen extends Component {
 }
 
 const mapStateToProps = state => ({
-  users: state.appState.users,
+  user: state.appState.userDetails,
   fetchingUserDetails: state.appState.fetchingUserDetails,
+  fetchingError: state.appState.fetchingError,
+  username: state.user.username,
+  userId: state.user.userId,
 });
 
 export default connect(
   mapStateToProps,
-  { getUserDetails },
+  { getUserDetails, signOut },
 )(UserDetailsScreen);

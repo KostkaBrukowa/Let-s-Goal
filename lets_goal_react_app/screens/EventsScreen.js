@@ -2,27 +2,34 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  Dimensions,
-  ImageBackground,
-  TouchableOpacity,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
 } from 'react-native';
 import PropTypes from 'prop-types';
-import { Constants } from 'expo';
-import { Set } from 'immutable';
 
 import { fetchUserGames } from '../redux/actions/gameAPIActions';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
-import PickFieldCallout from '../components/PickFieldCallout';
-import { ALMOST_WHITE_TINT, PURPLE_APP_TINT } from '../const/const';
+import { PURPLE_APP_TINT } from '../const/const';
 import GameTile from '../components/GameTile';
 import BackgroundImageScroll from '../components/BackGroundImageScroll';
 import { showGame } from '../redux/actions/appStateActions';
+import NavigationService from '../navigators/NavigationService';
+import EditButton from '../components/userDetails/EditButton';
+import NewGameTile from '../components/userDetails/NewGameTile';
+import VectorImageButton from '../components/ImageButton';
+import GameTilesContainer from '../components/eventsScreen/GameTilesContainer';
+
+function createGameTile(game, fields, onPress) {
+  const field = fields.filter(f => f.id === game.playing_field)[0];
+  return (
+    <GameTile
+      key={game.id}
+      street={`ul. ${field.street}`}
+      date={game.date}
+      name={game.name}
+      onPress={onPress}
+    />
+  );
+}
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -31,92 +38,82 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    // flex: 1,
-  },
-  box: {
-    width: 130,
-    height: 130,
-    borderWidth: 1,
-    borderColor: 'white',
-    margin: 5,
   },
   title: {
-    // width: '100%',
     paddingTop: '10%',
     color: 'white',
     fontSize: 20,
     textAlign: 'center',
   },
-  textInBox: {
-    fontSize: 22,
-    textAlign: 'center',
-    color: 'white',
-  },
-  addNewEventBox: {
-    backgroundColor: PURPLE_APP_TINT,
-    justifyContent: 'center',
-  },
 });
 
 export class EventsScreen extends Component {
-  static navigationOptions = {
-    tabBarLabel: 'My events',
-    tabBarIcon: BottomNavIcon('md-calendar'),
-    title: 'My events',
+  static navigationOptions = ({ navigation }) => {
+    const userId = navigation.getParam('userId');
+    const onPress = userId && (() => navigation.push('userDetails', { userId }));
+
+    return {
+      tabBarLabel: 'My events',
+      tabBarIcon: BottomNavIcon('md-calendar'),
+      title: 'My events',
+      headerRight: <VectorImageButton iconName="user-circle" onPress={onPress} size={32} />,
+    };
   };
 
   static propTypes = {
     isFetchingGames: PropTypes.bool.isRequired,
-    usersGames: PropTypes.array.isRequired,
+    games: PropTypes.array.isRequired,
     fields: PropTypes.array.isRequired,
     fetchUserGames: PropTypes.func.isRequired,
     showGame: PropTypes.func.isRequired,
+    username: PropTypes.string.isRequired,
+    userId: PropTypes.number.isRequired,
   };
 
   componentDidMount = () => {
-    const { fetchUserGames } = this.props;
-    fetchUserGames('Alex');
+    const {
+      fetchUserGames, username, navigation, userId,
+    } = this.props;
+    navigation.setParams({ userId });
+    fetchUserGames(username);
   };
 
-  goToGameDetails(game, field) {
-    const { showGame, navigation } = this.props;
-    showGame(game, field);
-    navigation.navigate('detailsScreen', { gameName: game.name });
+  goToGameDetails(game) {
+    const { navigation } = this.props;
+    navigation.navigate('detailsScreen', { gameName: game.name, gameId: game.id });
   }
 
   render() {
     const {
-      isFetchingGames, usersGames, fields, fetchUserGames,
+      isFetchingGames, games, fields, fetchUserGames, username, userId,
     } = this.props;
     // You haven't signed for any games yet. Click button below to add new one or go to Join
     // tab to join existing game.
 
-    const gameTiles = usersGames.map((game) => {
-      const field = fields.filter(f => f.id === game.playing_field)[0];
-      return (
-        <GameTile
-          key={game.id}
-          street={`ul. ${field.street}`}
-          date={game.date}
-          onPress={() => this.goToGameDetails(game, field)}
-        />
-      );
-    });
+    const createdGameTiles = games
+      .filter(game => game.owner === userId)
+      .map(game => createGameTile(game, fields, () => this.goToGameDetails(game)));
+
+    const joinedGameTiles = games
+      .filter(game => game.owner !== userId && game.players.includes(userId))
+      .map(game => createGameTile(game, fields, () => this.goToGameDetails(game)));
 
     return (
       <BackgroundImageScroll
         containerStyle={{ height: '100%' }}
-        onRefresh={() => fetchUserGames('Alex')}
+        onRefresh={() => fetchUserGames(username)}
         isLoading={isFetchingGames}
       >
         <View style={[{ paddingRight: '5%', paddingLeft: '5%' }, styles.container]}>
-          <Text style={styles.title}>My events</Text>
-          <ScrollView horizontal>
-            {gameTiles}
-            <TouchableOpacity style={[styles.box, styles.addNewEventBox]}>
-              <Text style={styles.textInBox}>Add new event</Text>
-            </TouchableOpacity>
-          </ScrollView>
+          {createdGameTiles.length !== 0 && (
+            <GameTilesContainer title="My events">
+              {createdGameTiles}
+              <NewGameTile />
+            </GameTilesContainer>
+          )}
+          {joinedGameTiles.length !== 0 && (
+            <GameTilesContainer title="Joined events">{joinedGameTiles}</GameTilesContainer>
+          )}
         </View>
       </BackgroundImageScroll>
     );
@@ -124,9 +121,11 @@ export class EventsScreen extends Component {
 }
 
 const mapStateToProps = state => ({
-  usersGames: state.gameAPI.usersGames,
+  games: state.gameAPI.games,
   fields: state.gameAPI.fields,
   isFetchingGames: state.gameAPI.isUsersGamesFetching,
+  username: state.user.username,
+  userId: state.user.userId,
 });
 
 // export default EventsScreen;

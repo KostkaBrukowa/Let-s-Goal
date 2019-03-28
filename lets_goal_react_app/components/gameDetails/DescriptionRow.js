@@ -30,21 +30,30 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'right',
   },
+  textInput: {
+    color: 'lightgrey',
+    backgroundColor: 'rgba(0,0,0, 0.23)',
+    borderRadius: 10,
+  },
 });
 
-function DescriptionRow({ leftText, rightText, editMode }) {
+function DescriptionRow({
+  leftText, rightText, editMode, onChangeText,
+}) {
   return (
     <View style={[styles.descriptionContainer]}>
       <View style={[styles.leftDescriptionContainer]}>
         <Text style={[styles.descriptionText, styles.leftDescriptionText]}>{leftText}</Text>
       </View>
       <View style={[styles.rightDescriptionContainer]}>
-        {!editMode || true ? (
+        {!editMode ? (
           <Text style={[styles.descriptionText, styles.rightDescriptionText]}>{rightText}</Text>
         ) : (
           <TextInput
-            style={[styles.descriptionText, styles.rightDescriptionText]}
+            style={[styles.descriptionText, styles.rightDescriptionText, styles.textInput]}
             value={rightText}
+            placeholder={leftText.slice(0, -1)}
+            onChangeText={onChangeText}
           />
         )}
       </View>
@@ -54,11 +63,14 @@ function DescriptionRow({ leftText, rightText, editMode }) {
 
 DescriptionRow.propTypes = {
   leftText: PropTypes.string.isRequired,
-  rightText: PropTypes.string.isRequired,
+  rightText: PropTypes.string,
   editMode: PropTypes.bool,
+  onChangeText: PropTypes.func,
 };
 DescriptionRow.defaultProps = {
   editMode: false,
+  rightText: '',
+  onChangeText: null,
 };
 
 export default DescriptionRow;
