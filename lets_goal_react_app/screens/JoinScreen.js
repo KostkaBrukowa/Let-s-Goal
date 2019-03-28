@@ -105,7 +105,12 @@ export class JoinScreen extends Component {
       .map((game) => {
         const field = fields.filter(f => f.id === game.playing_field)[0];
         return (
-          <GameTile key={game.id} onPress={() => this.toggleInfoTile(game.id)} side={160}>
+          <GameTile
+            key={game.id}
+            name={game.name}
+            onPress={() => this.toggleInfoTile(game.id)}
+            side={160}
+          >
             <InfoTile
               {...game}
               {...field}

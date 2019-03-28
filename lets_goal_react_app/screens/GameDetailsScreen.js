@@ -37,6 +37,20 @@ const styles = StyleSheet.create({
 
 // eslint-disable-next-line react/prefer-stateless-function
 class GameDetailsScreen extends React.Component {
+  componentDidUpdate = (prevProps) => {
+    const { games } = this.props;
+    const { games: prevGames } = prevProps;
+    if (games !== prevGames) {
+      console.log('and here');
+
+      const { navigation } = this.props;
+      const currentGame = games.find(game => game.id === navigation.getParam('gameId'));
+      if (!currentGame) {
+        navigation.goBack();
+      }
+    }
+  };
+
   render() {
     const { games, fields, navigation } = this.props;
     const gameId = navigation.getParam('gameId');

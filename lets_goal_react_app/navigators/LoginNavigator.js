@@ -11,7 +11,7 @@ export const LoginNavigator = createStackNavigator(
     register: RegisterScreen,
   },
   {
-    initialRouteName: 'login',
+    initialRouteName: 'welcome',
   },
 );
 

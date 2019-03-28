@@ -8,13 +8,13 @@ import {
   UPDATE_USER_DETAIL_FAIL,
   UPDATE_USER_DETAIL_SUCCESS,
   UPDATING_USER_DETAILS,
+  SIGN_OUT,
 } from '../actions/types';
-import { uniqueObjects } from '../../const/commonForReducers';
 
 const defaultState = {
   currentGameDetail: null,
   currentGameField: null,
-  users: [],
+  userDetails: null,
   fetchingUserDetails: false,
   fetchingError: null,
   updatingUserDetails: false,
@@ -34,7 +34,7 @@ export default function (state = defaultState, action) {
       const user = caseConverter.toCamelCase(action.payload);
       return {
         ...state,
-        users: uniqueObjects([...state.users, user], 'id'),
+        userDetails: user,
         fetchingUserDetails: false,
       };
     }
@@ -72,6 +72,8 @@ export default function (state = defaultState, action) {
         updatingUserDetails: false,
         updatingUserDetailsError: action.payload,
       };
+    case SIGN_OUT:
+      return defaultState;
 
     default:
       return state;

@@ -8,8 +8,9 @@ import {
   REMOVE_PLAYER_FAIL,
   NEW_GAME_FORM_SUBIMT_SUCCESS,
   NEW_GAME_FORM_FAIL,
-  LIST_NEAR_GAMES,
-  LIST_USERS_GAMES,
+  REMOVE_GAME_FAIL,
+  REMOVE_GAME_SUCCESS,
+  REMOVING_GAME,
   LIST_GAMES,
 } from './types';
 import { tokenConfig } from './authActions';
@@ -85,5 +86,25 @@ export const removePlayerFromGame = (username, gameId) => async (dispatch, getSt
       dispatch({ type: REMOVE_PLAYER_FAIL, payload: 'Could not connect to a server' });
     } else dispatch({ type: REMOVE_PLAYER_FAIL, payload: e.message });
     console.log(e.message);
+  }
+};
+
+export const removeGame = gameId => async (dispatch, getState) => {
+  dispatch({ type: REMOVING_GAME });
+  try {
+    const url = `${BASE_URL}games/${gameId}/`;
+    const config = { ...tokenConfig(getState), method: 'DELETE' };
+    const response = await timeout(10000, fetch(url, config));
+
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      throw new Error(errorMsg);
+    }
+
+    console.log('action here');
+
+    dispatch({ type: REMOVE_GAME_SUCCESS, payload: gameId });
+  } catch (e) {
+    dispatch({ type: REMOVE_GAME_FAIL, payload: e.message });
   }
 };

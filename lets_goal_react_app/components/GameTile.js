@@ -3,6 +3,7 @@ import {
   TouchableOpacity, StyleSheet, Text, View,
 } from 'react-native';
 import PropTypes from 'prop-types';
+import appStyle from '../const/globalStyles';
 
 const styles = StyleSheet.create({
   container: {
@@ -24,16 +25,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'grey',
   },
+  title: {},
 });
 
 const GameTile = (props) => {
   const {
-    street, date, onPress, side, children,
+    street, date, onPress, side, name, children,
   } = props;
   const dateString = date && date.substring(0, 10).replace(/-/g, '.');
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={[styles.box, { width: side, height: side }]} onPress={onPress}>
+      <TouchableOpacity
+        style={[appStyle.container, styles.box, { width: side, height: side }]}
+        onPress={onPress}
+      >
+        <Text style={appStyle.smallTitle}>{name}</Text>
         {children}
       </TouchableOpacity>
       {street && <Text style={styles.street}>{street}</Text>}
@@ -47,12 +53,14 @@ GameTile.propTypes = {
   date: PropTypes.string,
   onPress: PropTypes.func.isRequired,
   side: PropTypes.number,
+  name: PropTypes.string,
 };
 
 GameTile.defaultProps = {
   street: null,
   date: null,
   side: 130,
+  name: '',
 };
 
 export default GameTile;

@@ -9,6 +9,7 @@ import {
   PICK_DATE_FAIL,
   NEW_GAME_FORM_SUBIMT_SUCCESS,
   NEW_GAME_FORM_FAIL,
+  SIGN_OUT,
 } from '../actions/types';
 
 export const formInitialState = {
@@ -79,6 +80,8 @@ export default function (state = formInitialState, action) {
     case PICK_DATE_FAIL:
       return fail(state, 'date', action.payload);
 
+    case SIGN_OUT:
+      return formInitialState;
     default:
       return state;
   }

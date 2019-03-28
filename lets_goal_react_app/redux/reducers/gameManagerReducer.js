@@ -5,13 +5,19 @@ import {
   REMOVING_PLAYER,
   REMOVE_PLAYER_FAIL,
   REMOVE_PLAYER_SUCCESS,
+  REMOVING_GAME,
+  REMOVE_GAME_FAIL,
+  REMOVE_GAME_SUCCESS,
+  SIGN_OUT,
 } from '../actions/types';
 
 const defaultState = {
+  removingGame: false,
   joiningGame: false,
-  joinErrors: null,
   removingPlayer: false,
   removeErrors: null,
+  joinErrors: null,
+  removeGameError: null,
 };
 
 export default function (state = defaultState, action) {
@@ -50,6 +56,24 @@ export default function (state = defaultState, action) {
         removingPlayer: false,
         removeErrors: new String(action.payload),
       };
+    case REMOVING_GAME:
+      return {
+        ...state,
+        isRemovingGame: true,
+      };
+    case REMOVE_GAME_SUCCESS:
+      return {
+        ...state,
+        isRemovingGame: false,
+      };
+    case REMOVE_GAME_FAIL:
+      return {
+        ...state,
+        isRemovingGame: false,
+        removeGameError: new String(action.payload),
+      };
+    case SIGN_OUT:
+      return defaultState;
     default:
       return state;
   }

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { createSwitchNavigator } from 'react-navigation';
 
 import { LoginNavigator } from './LoginNavigator';
@@ -11,7 +9,7 @@ const MainNavigator = createSwitchNavigator(
     loginScreen: LoginNavigator,
   },
   {
-    initialRouteName: 'mainApp',
+    initialRouteName: 'loginScreen',
   },
 );
 

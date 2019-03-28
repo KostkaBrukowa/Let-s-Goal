@@ -9,6 +9,10 @@ import {
   FETCHING_NEAR_GAMES,
   LIST_USERS_GAMES_FAIL,
   LIST_NEAR_GAMES_FAIL,
+  REMOVING_GAME,
+  REMOVE_GAME_SUCCESS,
+  REMOVE_GAME_FAIL,
+  SIGN_OUT,
 } from '../actions/types';
 
 import { uniqueObjects } from '../../const/commonForReducers';
@@ -83,6 +87,13 @@ export default function (state = apiDefaultState, action) {
         fields: uniqueObjects([...fields, ...parsedFields], 'id'),
       };
     }
+    case REMOVE_GAME_SUCCESS:
+      return {
+        ...state,
+        games: state.games.filter(g => g.id !== action.payload),
+      };
+    case SIGN_OUT:
+      return apiDefaultState;
     default:
       return state;
   }

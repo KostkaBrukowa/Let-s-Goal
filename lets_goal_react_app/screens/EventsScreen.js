@@ -21,7 +21,13 @@ import GameTilesContainer from '../components/eventsScreen/GameTilesContainer';
 function createGameTile(game, fields, onPress) {
   const field = fields.filter(f => f.id === game.playing_field)[0];
   return (
-    <GameTile key={game.id} street={`ul. ${field.street}`} date={game.date} onPress={onPress} />
+    <GameTile
+      key={game.id}
+      street={`ul. ${field.street}`}
+      date={game.date}
+      name={game.name}
+      onPress={onPress}
+    />
   );
 }
 

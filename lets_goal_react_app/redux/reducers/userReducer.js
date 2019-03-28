@@ -57,12 +57,7 @@ export default function (state = defaultState, action) {
         isBeingAuthenticated: true,
       };
     case SIGN_OUT:
-      return {
-        ...state,
-        username: null,
-        token: null,
-        userId: null,
-      };
+      return defaultState;
     default:
       return state;
   }

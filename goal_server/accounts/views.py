@@ -3,7 +3,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .models import UserDetails
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
+from django.db.models import F
 from django.contrib.auth.models import User
 from .serializers import UserDetailsSerializer
 from rest_framework import viewsets, status
@@ -51,6 +52,19 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
         user = instance.owner
         user.details.created_events_number = user.details.created_events_number + 1
         user.details.save()
+
+
+@receiver(pre_delete, sender=Game)
+def update_user_score_after_game_delete(sender, instance=None, **kwargs):
+    if instance:
+        owner = instance.owner
+        owner.details.created_events_number = owner.details.created_events_number - 1
+        owner.details.save()
+
+        other_players = instance.players.exclude(id=owner.id).all()
+        for player in other_players:
+            player.details.joined_events_number = player.details.joined_events_number - 1
+            player.details.save()
 
 
 class ExtraDetailsLoginView(LoginView):

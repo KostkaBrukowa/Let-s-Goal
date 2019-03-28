@@ -3,7 +3,7 @@ import { Button, View, ActivityIndicator } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { joinGame, removePlayerFromGame } from '../../redux/actions/gameManagerActions';
+import { joinGame, removePlayerFromGame, removeGame } from '../../redux/actions/gameManagerActions';
 import { PURPLE_APP_TINT } from '../../const/const';
 
 function DownButton(props) {
@@ -22,9 +22,10 @@ function DownButton(props) {
   let title;
   let onPress;
   if (isOwner) {
-    // const {removePlayerFromGame} = props
+    const { removeGame } = props;
     title = 'Remove the game';
-    onPress = () => console.log('removing game');
+    onPress = () => removeGame(gameId);
+    console.log('here');
   } else if (isInGame) {
     const { removePlayerFromGame, username } = props;
     title = 'Leave the game';
@@ -54,6 +55,7 @@ DownButton.propTypes = {
   // redux actions
   removePlayerFromGame: PropTypes.func.isRequired,
   joinGame: PropTypes.func.isRequired,
+  removeGame: PropTypes.func.isRequired,
 };
 DownButton.defaultProps = {
   buttonStyle: {},
@@ -70,6 +72,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = {
   joinGame,
   removePlayerFromGame,
+  removeGame,
 };
 
 export default connect(

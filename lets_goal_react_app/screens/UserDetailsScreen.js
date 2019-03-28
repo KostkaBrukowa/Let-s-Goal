@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-  View, ToastAndroid, Image, StyleSheet, Dimensions, Animated,
+  View, ToastAndroid, Image, StyleSheet, Dimensions, Animated, Text,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -16,8 +16,10 @@ import appStyle from '../const/globalStyles';
 import GamesCountRow from '../components/userDetails/GamesCount';
 import EditButton from '../components/userDetails/EditButton';
 import VectorImageButton from '../components/ImageButton';
+import OnOfTransformView from '../components/userDetails/OnOfTransformView';
 
 const profileImageSide = 170;
+const animationDuration = 600;
 
 const styles = StyleSheet.create({
   profileImage: {
@@ -60,13 +62,14 @@ class UserDetailsScreen extends Component {
   state = {
     user: null,
     editMode: false,
-    animatedValue: new Animated.Value(0),
+    positionFlipped: false,
   };
 
   static propTypes = {
     fetchingUserDetails: PropTypes.bool.isRequired,
     getUserDetails: PropTypes.func.isRequired,
-    users: PropTypes.array.isRequired,
+    signOut: PropTypes.func.isRequired,
+    user: PropTypes.object,
     navigation: PropTypes.object.isRequired,
     fetchingError: PropTypes.instanceOf(String),
     username: PropTypes.string.isRequired,
@@ -75,6 +78,7 @@ class UserDetailsScreen extends Component {
   componentDidMount = () => {
     const { navigation, getUserDetails } = this.props;
     const userId = navigation.getParam('userId');
+    // debugger;
     if (userId) getUserDetails(userId);
   };
 
@@ -87,14 +91,14 @@ class UserDetailsScreen extends Component {
       navigation.goBack();
     }
 
-    const { users } = this.props;
-    const { users: prevUsers } = prevProps;
-    if (users !== prevUsers) {
+    const { user } = this.props;
+    const { user: prevUser } = prevProps;
+    if (user !== prevUser) {
       const { navigation, username, signOut } = this.props;
       const userId = navigation.getParam('userId');
-      const user = users.find(user => user.id === userId);
+      if (user.id !== userId) return;
 
-      const isCurrentUser = username === user.username;
+      const isCurrentUser = user && username === user.username;
       const title = isCurrentUser ? 'Your profile' : user.username;
       navigation.setParams({ title, isCurrentUser, signOut });
       this.setState({ user });
@@ -102,19 +106,12 @@ class UserDetailsScreen extends Component {
   };
 
   toggleEditMode = () => {
-    const { animatedValue, editMode } = this.state;
-    Animated.timing(animatedValue, {
-      toValue: editMode ? 0 : 1,
-      duration: 300,
-    }).start(() => {
-      this.setState({ editMode: !editMode });
-    });
+    this.setState(state => ({ positionFlipped: !state.positionFlipped }));
+    setTimeout(
+      () => this.setState(state => ({ editMode: !state.editMode })),
+      animationDuration + 100,
+    );
   };
-
-  interpolateAnimated = ({ outRange }) => this.state.animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: outRange,
-  });
 
   editObject = fieldName => ({
     editMode: this.state.editMode,
@@ -128,16 +125,11 @@ class UserDetailsScreen extends Component {
 
   render() {
     const { fetchingUserDetails, username } = this.props;
-    const { user, editMode } = this.state;
+    const { user, editMode, positionFlipped } = this.state;
     const { height: screenHeight } = Dimensions.get('screen');
     const height = screenHeight - 2 * Header.HEIGHT;
 
     const profileImage = require('../assets/images/no-image-profile.png');
-    const upperOpacity = this.interpolateAnimated({ outRange: [1, 0.15] });
-    const yTransformUpper = this.interpolateAnimated({ outRange: [0, 0.32 * screenHeight] });
-    const yTransformLower = this.interpolateAnimated({ outRange: [0, -0.32 * screenHeight] });
-    const scaleTranform = this.interpolateAnimated({ outRange: [1, 1.08] });
-
     if (fetchingUserDetails || !user) {
       return (
         <BackgroundImage dim stackHeader>
@@ -148,11 +140,12 @@ class UserDetailsScreen extends Component {
     return (
       <BackgroundImage dim stackHeader>
         <View style={[{ height, width: '100%' }, appStyle.container]}>
-          <Animated.View
-            style={[
-              styles.upperContainer,
-              { transform: [{ translateY: yTransformUpper }], opacity: upperOpacity },
-            ]}
+          <OnOfTransformView
+            transformOn={positionFlipped}
+            transformRange={[{ translateY: [0, 0.32 * screenHeight] }]}
+            opacity={[1, 0.15]}
+            duration={animationDuration}
+            style={styles.upperContainer}
           >
             <Image style={styles.profileImage} source={profileImage} />
             <Title title={user.username} containerStyle={styles.titleStyle} />
@@ -162,18 +155,16 @@ class UserDetailsScreen extends Component {
               descriptionRight="joined games"
               countRight={user.joinedEventsNumber}
             />
-          </Animated.View>
-          <Animated.View
-            style={[
-              styles.lowerContainer,
-              {
-                transform: [
-                  { translateY: yTransformLower },
-                  { scaleX: scaleTranform },
-                  { scaleY: scaleTranform },
-                ],
-              },
+          </OnOfTransformView>
+          <OnOfTransformView
+            transformOn={positionFlipped}
+            transformRange={[
+              { translateY: [0, -0.32 * screenHeight] },
+              { scaleX: [1, 1.08] },
+              { scaleY: [1, 1.08] },
             ]}
+            duration={animationDuration}
+            style={styles.lowerContainer}
           >
             <Title title="Profile details" containerStyle={styles.titleStyle} />
             <DescriptionRow
@@ -207,7 +198,7 @@ class UserDetailsScreen extends Component {
               visible={user.username === username}
               onPress={this.toggleEditMode}
             />
-          </Animated.View>
+          </OnOfTransformView>
         </View>
       </BackgroundImage>
     );
@@ -215,7 +206,7 @@ class UserDetailsScreen extends Component {
 }
 
 const mapStateToProps = state => ({
-  users: state.appState.users,
+  user: state.appState.userDetails,
   fetchingUserDetails: state.appState.fetchingUserDetails,
   fetchingError: state.appState.fetchingError,
   username: state.user.username,

@@ -77,3 +77,4 @@ export const fetchNearGames = ({ longitude, latitude }) => async (dispatch, getS
     dispatch({ type: LIST_NEAR_GAMES_FAIL, payload: e.message });
   }
 };
+
