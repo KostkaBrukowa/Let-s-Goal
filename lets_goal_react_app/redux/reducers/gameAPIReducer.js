@@ -1,7 +1,4 @@
-import { Set, List } from 'immutable';
-
 import {
-  NEW_GAME_FORM_SUBIMT_SUCCESS,
   LIST_GAMES,
   LIST_NEAR_GAMES,
   LIST_FIELDS,
@@ -9,9 +6,7 @@ import {
   FETCHING_NEAR_GAMES,
   LIST_USERS_GAMES_FAIL,
   LIST_NEAR_GAMES_FAIL,
-  REMOVING_GAME,
   REMOVE_GAME_SUCCESS,
-  REMOVE_GAME_FAIL,
   SIGN_OUT,
 } from '../actions/types';
 
@@ -29,11 +24,6 @@ export const apiDefaultState = {
 
 export default function (state = apiDefaultState, action) {
   switch (action.type) {
-    // case NEW_GAME_FORM_SUBIMT_SUCCESS:
-    //   return {
-    //     ...state,
-    //     usersGames: [...state.usersGames, action.payload],
-    //   };
     case FETCHING_USERS_GAMES:
       return {
         ...state,

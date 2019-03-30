@@ -65,10 +65,3 @@ def update_user_score_after_game_delete(sender, instance=None, **kwargs):
         for player in other_players:
             player.details.joined_events_number = player.details.joined_events_number - 1
             player.details.save()
-
-
-class ExtraDetailsLoginView(LoginView):
-    def get_response(self):
-        data = super().get_response().data
-        data['user_id'] = self.user.id
-        return Response(data=data, status=status.HTTP_200_OK)

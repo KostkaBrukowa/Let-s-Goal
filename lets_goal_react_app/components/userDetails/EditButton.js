@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import SwitchButton from '../SwitchButton';
+import SwitchButton from '../common/SwitchButton';
 
 function EditButton(props) {
   const { editMode, visible } = props;

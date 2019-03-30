@@ -1,36 +1,19 @@
 import React, { Component } from 'react';
 import {
-  Alert,
-  TouchableOpacity,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  View,
-  Text,
-  TextInput,
-  Button,
-  ImageBackground,
-  Dimensions,
-  StyleSheet,
+  Alert, ActivityIndicator, KeyboardAvoidingView, Text, StyleSheet,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import { PURPLE_APP_TINT } from '../const/const';
-import appStyle from '../const/globalStyles';
-import BackgroundImage from '../components/BackgroundImage';
-import CustomButton from '../components/CustomButton';
+import appStyle from '../const/appStyles';
+import BackgroundImage from '../components/common/BackgroundImage';
+import CustomButton from '../components/common/CustomButton';
 import { login } from '../redux/actions/authActions';
 import FormTextInput from '../components/login/FormTextInput';
 import DescriptionWithLink from '../components/login/DescriptionWithLink';
 
 const styles = StyleSheet.create({
-  button: {
-    width: 300,
-    height: 50,
-    borderRadius: 5,
-    marginTop: 26,
-  },
-
   buttonTitle: {
     fontSize: 17,
     color: 'white',
@@ -67,7 +50,7 @@ class LoginScreen extends Component {
       const { loginErrors } = this.props;
       const { isAuthenticated } = this.props;
       if (loginErrors) {
-        this.makeAlert('Ups... Something went wrong', loginErrors.error);
+        Alert.alert('Ups... Something went wrong', loginErrors.error, [{ text: 'Ok' }]);
       } else if (isAuthenticated) {
         const { navigation } = this.props;
         this.setState(initialState);
@@ -84,12 +67,7 @@ class LoginScreen extends Component {
       return;
     }
 
-    const { login } = this.props;
-    login(username, password);
-  };
-
-  makeAlert = (title, message) => {
-    Alert.alert(title, message, [{ text: 'Ok' }]);
+    this.props.login(username, password);
   };
 
   render() {
@@ -115,16 +93,16 @@ class LoginScreen extends Component {
             error={passwordError}
             secureTextEntry
           />
-          {!isBeingAuthenticated ? (
+          {isBeingAuthenticated ? (
+            <ActivityIndicator size={46} style={{ marginTop: 30 }} color="white" />
+          ) : (
             <CustomButton
-              style={styles.button}
+              style={appStyle.loginButtonStyle}
               textStyle={styles.buttonTitle}
               onPress={() => this.logUserIn(username, password)}
               title="Log in"
               color={PURPLE_APP_TINT}
             />
-          ) : (
-            <ActivityIndicator size={46} style={{ marginTop: 30 }} color="white" />
           )}
 
           <DescriptionWithLink

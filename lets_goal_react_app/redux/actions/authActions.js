@@ -5,9 +5,18 @@ import {
 import { BASE_URL, timeout } from '../../const/commonForActions';
 import NavigationService from '../../navigators/NavigationService';
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+export const tokenConfig = (getState) => {
+  const { token } = getState().user;
+  const options = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  if (token) {
+    options.headers.Authorization = `Token ${token}`;
+  }
+  return options;
+};
 
 export const login = (username, password) => async (dispatch) => {
   dispatch({ type: AUTHENTICATING_USER });
@@ -32,7 +41,7 @@ export const login = (username, password) => async (dispatch) => {
       return;
     }
 
-    const { key: token, user_id: userId } = await response.json();
+    const { key: token, user: userId } = await response.json();
 
     dispatch({ type: LOG_IN_SUCCESS, payload: { token, username, userId } });
   } catch (e) {
@@ -69,8 +78,11 @@ export const register = user => async (dispatch) => {
       return;
     }
 
-    dispatch({ type: LOG_IN_SUCCESS, payload: { token: data.token, username: user.username } });
-    // dispatch({ type: LOG_IN_SUCCESS });
+    const { key: token, user: userId } = data;
+    dispatch({
+      type: LOG_IN_SUCCESS,
+      payload: { token, userId, username: user.username },
+    });
   } catch (e) {
     dispatch({
       type: REGISTER_FAIL,
@@ -83,17 +95,4 @@ export const register = user => async (dispatch) => {
 export const signOut = () => {
   NavigationService.navigate('loginScreen');
   return dispatch => dispatch({ type: SIGN_OUT });
-};
-
-export const tokenConfig = (getState) => {
-  const { token } = getState().user;
-  const options = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-  if (token) {
-    options.headers.Authorization = `Token ${token}`;
-  }
-  return options;
 };

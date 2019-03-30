@@ -19,4 +19,10 @@ export default StyleSheet.create({
     position: 'absolute',
     zIndex: -10,
   },
+  loginButtonStyle: {
+    width: 300,
+    height: 50,
+    borderRadius: 5,
+    marginTop: 26,
+  },
 });

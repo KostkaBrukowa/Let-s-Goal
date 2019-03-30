@@ -4,14 +4,14 @@ import PropTypes from 'prop-types';
 
 import { Header } from 'react-navigation';
 
-import appStyle from '../const/globalStyles';
+import appStyle from '../../const/appStyles';
 
 function BackgroundImage(props) {
   const { children, dim, stackHeader } = props;
   const { height } = Dimensions.get('screen');
   const image = dim
-    ? require('../assets/images/background-field_night.jpg')
-    : require('../assets/images/background-field.jpg');
+    ? require('../../assets/images/background-field_night.jpg')
+    : require('../../assets/images/background-field.jpg');
   return (
     <ImageBackground
       style={[appStyle.container, { height, marginTop: stackHeader ? -Header.HEIGHT : 0 }]}

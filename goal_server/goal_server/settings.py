@@ -67,6 +67,10 @@ REST_FRAMEWORK = {
     )
 }
 
+REST_AUTH_SERIALIZERS = {
+    'TOKEN_SERIALIZER': 'accounts.serializers.ExtraDetailsTokenSerializer',
+}
+
 ROOT_URLCONF = 'goal_server.urls'
 
 TEMPLATES = [

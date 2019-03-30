@@ -1,11 +1,9 @@
 import React from 'react';
-import {
-  View, Text, StyleSheet, TouchableOpacity, Button,
-} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { Marker, Callout } from 'react-native-maps';
 
-import { PURPLE_APP_TINT } from '../const/const';
+import { PURPLE_APP_TINT } from '../../const/const';
+import appStyles from '../../const/appStyles';
 
 const styles = StyleSheet.create({
   container: {
@@ -34,8 +32,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    ...appStyles.container,
     backgroundColor: PURPLE_APP_TINT,
     height: 35.4,
     borderRadius: 5,
@@ -56,7 +53,6 @@ function PickFieldCallout({ street, owner, price }) {
       <View style={styles.buttonContainer}>
         <Text style={styles.buttonTitle}>Pick</Text>
       </View>
-      {/* <Button title="dupa" onPress={() => {}} /> */}
     </View>
   );
 }

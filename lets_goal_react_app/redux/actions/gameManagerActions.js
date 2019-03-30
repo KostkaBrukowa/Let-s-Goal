@@ -101,8 +101,6 @@ export const removeGame = gameId => async (dispatch, getState) => {
       throw new Error(errorMsg);
     }
 
-    console.log('action here');
-
     dispatch({ type: REMOVE_GAME_SUCCESS, payload: gameId });
   } catch (e) {
     dispatch({ type: REMOVE_GAME_FAIL, payload: e.message });

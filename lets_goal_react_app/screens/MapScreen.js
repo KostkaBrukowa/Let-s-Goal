@@ -1,12 +1,11 @@
 /* eslint-disable react/require-default-props */
-/* eslint-disable react/forbid-prop-types */
 import React from 'react';
 import { MapView } from 'expo';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { fetchNearFields } from '../redux/actions/gameAPIActions';
-import PickFieldMarker from '../components/PickFieldMarker';
+import PickFieldMarker from '../components/newGameScreen/PickFieldMarker';
 
 const defaultRegion = {
   latitude: 37.78825,
@@ -24,6 +23,7 @@ class Map extends React.Component {
     fields: PropTypes.array.isRequired,
     chosenField: PropTypes.number,
     fetchNearFields: PropTypes.func.isRequired,
+    navigation: PropTypes.object.isRequired,
   };
 
   state = { region: defaultRegion };

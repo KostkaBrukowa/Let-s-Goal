@@ -1,6 +1,7 @@
+// TODO CHECK USERNAME WTF
 import React, { Component } from 'react';
 import {
-  View, ToastAndroid, Image, StyleSheet, Dimensions, Animated, Text,
+  View, ToastAndroid, Image, StyleSheet, Dimensions,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -9,13 +10,13 @@ import { Header } from 'react-navigation';
 import { getUserDetails } from '../redux/actions/appStateActions';
 import { signOut } from '../redux/actions/authActions';
 import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
-import BackgroundImage from '../components/BackgroundImage';
+import BackgroundImage from '../components/common/BackgroundImage';
 import DescriptionRow from '../components/gameDetails/DescriptionRow';
 import Title from '../components/gameDetails/Title';
-import appStyle from '../const/globalStyles';
+import appStyle from '../const/appStyles';
 import GamesCountRow from '../components/userDetails/GamesCount';
 import EditButton from '../components/userDetails/EditButton';
-import VectorImageButton from '../components/ImageButton';
+import VectorImageButton from '../components/common/VectorImageButton';
 import OnOfTransformView from '../components/userDetails/OnOfTransformView';
 
 const profileImageSide = 170;
@@ -35,12 +36,15 @@ const styles = StyleSheet.create({
     flex: 11,
   },
   lowerContainer: {
-    ...appStyle.container,
-    flex: 14,
+    alignItems: 'center',
     justifyContent: 'space-evenly',
+    flex: 14,
     marginBottom: '13%',
   },
-  button: { width: 100, marginTop: 5 },
+  button: {
+    width: 100,
+    marginTop: 5,
+  },
 });
 
 class UserDetailsScreen extends Component {
@@ -66,9 +70,11 @@ class UserDetailsScreen extends Component {
   };
 
   static propTypes = {
+    // redux actions
     fetchingUserDetails: PropTypes.bool.isRequired,
     getUserDetails: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired,
+    // redux state
     user: PropTypes.object,
     navigation: PropTypes.object.isRequired,
     fetchingError: PropTypes.instanceOf(String),
@@ -78,30 +84,30 @@ class UserDetailsScreen extends Component {
   componentDidMount = () => {
     const { navigation, getUserDetails } = this.props;
     const userId = navigation.getParam('userId');
-    // debugger;
     if (userId) getUserDetails(userId);
   };
 
   componentDidUpdate = (prevProps) => {
-    const { fetchingError } = this.props;
-    const { fetchingError: prevFetchingError } = prevProps;
-    if (fetchingError !== prevFetchingError) {
-      const { navigation } = this.props;
-      ToastAndroid.show('Could not connect to a sever', ToastAndroid.SHORT);
-      navigation.goBack();
-    }
+    const { navigation, user } = this.props;
+    // handle the case of two simultaneous screens
+    const userId = navigation.getParam('userId');
+    if (user && this.props.user.id !== userId) return;
 
-    const { user } = this.props;
     const { user: prevUser } = prevProps;
     if (user !== prevUser) {
-      const { navigation, username, signOut } = this.props;
-      const userId = navigation.getParam('userId');
-      if (user.id !== userId) return;
+      const { username, signOut } = this.props;
 
       const isCurrentUser = user && username === user.username;
       const title = isCurrentUser ? 'Your profile' : user.username;
       navigation.setParams({ title, isCurrentUser, signOut });
       this.setState({ user });
+    }
+
+    const { fetchingError } = this.props;
+    const { fetchingError: prevFetchingError } = prevProps;
+    if (fetchingError !== prevFetchingError) {
+      ToastAndroid.show('Could not connect to a sever', ToastAndroid.SHORT);
+      navigation.goBack();
     }
   };
 
@@ -122,6 +128,33 @@ class UserDetailsScreen extends Component {
       },
     })),
   });
+
+  renderDescritptionRows = () => {
+    const { user } = this.state;
+    const labels = ['firstName', 'lastName', 'birthDate', 'email', 'address', 'preferedPosition'];
+
+    // simple 'firstName' ===> 'First name:'
+    const labelToInfoText = (label) => {
+      const notCapitalized = label.split('').reduce((result, char) => {
+        if (char === char.toLowerCase()) return result + char;
+        return `${result} ${char.toLowerCase()}`;
+      }, '');
+
+      return `${notCapitalized.charAt(0).toUpperCase() + notCapitalized.slice(1)}:`;
+    };
+
+    const rows = labels.map((label, index) => (
+      <DescriptionRow
+        // eslint-disable-next-line react/no-array-index-key
+        key={index}
+        leftText={labelToInfoText(label)}
+        rightText={`${user[label] || ''}`}
+        {...this.editObject(label)}
+      />
+    ));
+
+    return rows;
+  };
 
   render() {
     const { fetchingUserDetails, username } = this.props;
@@ -166,33 +199,7 @@ class UserDetailsScreen extends Component {
             duration={animationDuration}
             style={styles.lowerContainer}
           >
-            <Title title="Profile details" containerStyle={styles.titleStyle} />
-            <DescriptionRow
-              leftText="First name:"
-              rightText={`${user.firstName || ''}`}
-              {...this.editObject('firstName')}
-            />
-            <DescriptionRow
-              leftText="Last name:"
-              rightText={`${user.lastName || ''}`}
-              {...this.editObject('lastName')}
-            />
-            <DescriptionRow
-              leftText="Birth Date:"
-              rightText={user.birthDate || ''}
-              {...this.editObject('birthDate')}
-            />
-            <DescriptionRow leftText="E-mail address:" rightText={user.email || ''} />
-            <DescriptionRow
-              leftText="Address:"
-              rightText={user.address || ''}
-              {...this.editObject('address')}
-            />
-            <DescriptionRow
-              leftText="Prefered position:"
-              rightText={user.preferedPosition}
-              {...this.editObject('preferedPosition')}
-            />
+            {this.renderDescritptionRows()}
             <EditButton
               editMode={editMode}
               visible={user.username === username}
@@ -209,6 +216,7 @@ const mapStateToProps = state => ({
   user: state.appState.userDetails,
   fetchingUserDetails: state.appState.fetchingUserDetails,
   fetchingError: state.appState.fetchingError,
+  loggedUser: state.user,
   username: state.user.username,
   userId: state.user.userId,
 });

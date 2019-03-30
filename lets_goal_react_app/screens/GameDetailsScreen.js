@@ -1,27 +1,24 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import {
-  StyleSheet, View, Dimensions, ScrollView,
+  StyleSheet, View, Dimensions, ScrollView, ToastAndroid,
 } from 'react-native';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { MapView } from 'expo';
 import { Marker } from 'react-native-maps';
-import caseConverter from 'case-converter';
 
-import BackgroundImageScroll from '../components/BackGroundImageScroll';
+import BackgroundImageScroll from '../components/common/BackGroundImageScroll';
 import DescriptionRow from '../components/gameDetails/DescriptionRow';
 import Title from '../components/gameDetails/Title';
 import PlayerImageTile from '../components/gameDetails/PlayerImageTile';
 import DownButton from '../components/gameDetails/DownButton';
 import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
-import BackgroundImage from '../components/BackgroundImage';
-import VectorImageButton from '../components/ImageButton';
+import BackgroundImage from '../components/common/BackgroundImage';
+import appStyle from '../const/appStyles';
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    ...appStyle.container,
     width: '100%',
   },
   horizontalScroll: {
@@ -41,11 +38,10 @@ class GameDetailsScreen extends React.Component {
     const { games } = this.props;
     const { games: prevGames } = prevProps;
     if (games !== prevGames) {
-      console.log('and here');
-
       const { navigation } = this.props;
       const currentGame = games.find(game => game.id === navigation.getParam('gameId'));
       if (!currentGame) {
+        ToastAndroid.show('Game was succesfuly removed', ToastAndroid.SHORT);
         navigation.goBack();
       }
     }
@@ -109,10 +105,6 @@ class GameDetailsScreen extends React.Component {
     );
   }
 }
-
-GameDetailsScreen.propTypes = {
-  userId: PropTypes.number.isRequired,
-};
 
 GameDetailsScreen.navigationOptions = ({ navigation }) => ({
   title: navigation.getParam('gameName'),

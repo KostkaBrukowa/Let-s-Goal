@@ -1,14 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import appStyle from '../../const/globalStyles';
+import appStyle from '../../const/appStyles';
 
-const test = {
-  borderWidth: 2,
-  borderColor: 'white',
-};
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    flexDirection: 'row',
+    width: '100%',
+  },
+  countContainer: {
+    ...appStyle.container,
+    flex: 1,
+  },
   count: {
     ...appStyle.smallTitle,
   },
@@ -20,8 +23,8 @@ const styles = StyleSheet.create({
 
 // eslint-disable-next-line react/prop-types
 const GameCount = ({ description, count }) => (
-  <View style={{ flex: 1, ...appStyle.container }}>
-    <Text style={styles.count}>{count}</Text>
+  <View style={styles.countContainer}>
+    <Text style={appStyle.smallTitle}>{count}</Text>
     <Text style={styles.description}>{description}</Text>
   </View>
 );
@@ -31,7 +34,7 @@ function GamesCountRow(props) {
     descriptionLeft, descriptionRight, countLeft, countRight,
   } = props;
   return (
-    <View style={{ flexDirection: 'row', width: '100%' }}>
+    <View style={styles.container}>
       <GameCount description={descriptionLeft} count={countLeft} />
       <GameCount description={descriptionRight} count={countRight} />
     </View>

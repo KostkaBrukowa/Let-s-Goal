@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  TouchableOpacity, View, Text, StyleSheet,
-} from 'react-native';
+import { TouchableOpacity, View, Text } from 'react-native';
 
-import appStyle from '../const/globalStyles';
+import appStyle from '../../const/appStyles';
 
-const styles = StyleSheet.create({
-  defaultButtonStyle: {},
-});
 function CustomButton(props) {
   const {
     style, textStyle, containerStyle, onPress, title, color,
@@ -34,8 +29,9 @@ CustomButton.propTypes = {
 };
 
 CustomButton.defaultProps = {
-  style: StyleSheet.create({}),
-  textStyle: StyleSheet.create({}),
+  style: {},
+  textStyle: {},
+  containerStyle: {},
 };
 
 export default CustomButton;

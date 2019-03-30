@@ -5,19 +5,17 @@ import PropTypes from 'prop-types';
 
 import InputImage from '../InputImage';
 import AnimatedText from '../AnimatedText';
+import appStyles from '../../../const/appStyles';
+import { ERROR_COLOR } from '../../../const/const';
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    ...appStyles.container,
     width: '100%',
   },
-  imageInputContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  imageInputContainer: appStyles.container,
   error: {
-    color: 'red',
+    color: ERROR_COLOR,
     textAlign: 'center',
     fontSize: 17,
   },
@@ -27,36 +25,39 @@ export default class NumberPicker extends Component {
   static defaultProps = {
     keyboardType: 'default',
     title: '',
-    width: 0.75,
-    onFocus: () => {},
+    screenWidth: 0.75,
+    onFocus: null,
   };
 
   static propTypes = {
-    value: PropTypes.string,
+    submitedValue: PropTypes.string,
     errors: PropTypes.string,
     pickValue: PropTypes.func.isRequired,
     keyboardType: PropTypes.string,
     title: PropTypes.string,
     icon: PropTypes.string.isRequired,
-    width: PropTypes.number,
+    screenWidth: PropTypes.number,
     onFocus: PropTypes.func,
   };
 
   state = {
     isTextInputVisible: false,
+    value: '',
   };
 
   componentDidUpdate = (prevProps) => {
-    const { value, errors } = this.props;
-    if (prevProps.value !== value && value && !errors) {
-      this.setState({ isTextInputVisible: false });
-    }
+    const { submitedValue, errors } = this.props;
+    const { submitedValue: prevSubmitedValue } = prevProps;
 
-    // const { isTextInputVisible } = this.state;
-    // const { isTextInputVisible: prevIsTextInputVisible } = prevProps;
-    // if (isTextInputVisible !== prevIsTextInputVisible && isTextInputVisible) {
-    //   this.props.onFocus();
-    // }
+    if (submitedValue !== prevSubmitedValue) {
+      // value was correct
+      if (submitedValue && !errors) {
+        this.setState({ isTextInputVisible: false });
+      } else if (submitedValue == null && prevSubmitedValue !== null) {
+        // whole form was correct
+        this.setState({ isTextInputVisible: false, value: '' });
+      }
+    }
   };
 
   toggleInput = () => {
@@ -66,11 +67,11 @@ export default class NumberPicker extends Component {
   };
 
   render() {
-    const { isTextInputVisible } = this.state;
+    const { value } = this.state;
     const {
-      value, errors, pickValue, title, icon, keyboardType, width, onFocus,
+      submitedValue, errors, pickValue, title, icon,
     } = this.props;
-    const isSelected = value != null && errors == null;
+    const isSelected = submitedValue != null && errors == null;
     return (
       <View style={[styles.container]}>
         <View style={styles.imageInputContainer}>
@@ -84,11 +85,10 @@ export default class NumberPicker extends Component {
           />
           {errors && <Text style={styles.error}>{errors}</Text>}
           <AnimatedText
-            keyboardType={keyboardType}
-            isTextInputVisible={isTextInputVisible}
-            onBlur={pickValue}
-            onFocus={onFocus}
-            widthPart={width}
+            {...this.props}
+            {...this.state}
+            onChangeText={value => this.setState({ value })}
+            onBlur={() => pickValue(value)}
           />
         </View>
       </View>

@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
+import appStyle from '../../const/appStyles';
+
 const styles = StyleSheet.create({
   scrollStyle: {
     flex: 1,
@@ -18,17 +20,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageStyle: {
-    resizeMode: 'cover',
-    position: 'absolute',
-    zIndex: -10,
+    ...appStyle.backgroundAbsoluteStyle,
   },
 });
 
 const BackgroundImageScroll = (props) => {
   const {
-    children, containerStyle, source, onRefresh, isLoading, scrollRef,
+    children, containerStyle, onRefresh, isLoading, scrollRef,
   } = props;
-  const { width, height } = Dimensions.get('window');
+  const { width } = Dimensions.get('window');
   return (
     <ScrollView
       style={styles.scrollStyle}
@@ -40,7 +40,7 @@ const BackgroundImageScroll = (props) => {
         <ImageBackground
           style={styles.container}
           imageStyle={[styles.imageStyle, { width, height: 1116 }]}
-          source={require('../assets/images/background-field-dim.png')}
+          source={require('../../assets/images/background-field-dim.png')}
         >
           {children}
         </ImageBackground>
@@ -49,6 +49,18 @@ const BackgroundImageScroll = (props) => {
   );
 };
 
-BackgroundImageScroll.propTypes = {};
+BackgroundImageScroll.propTypes = {
+  containerStyle: PropTypes.object,
+  onRefresh: PropTypes.func,
+  isLoading: PropTypes.bool,
+  scrollRef: PropTypes.func,
+};
+
+BackgroundImageScroll.defaultProps = {
+  containerStyle: {},
+  onRefresh: null,
+  isLoading: false,
+  scrollRef: null,
+};
 
 export default BackgroundImageScroll;

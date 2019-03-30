@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
-  View, TextInput, StyleSheet, Text, Animated, ScrollView,
+  View, TextInput, StyleSheet, Text, Animated,
 } from 'react-native';
 import { ERROR_COLOR } from '../../const/const';
 

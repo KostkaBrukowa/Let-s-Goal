@@ -3,7 +3,7 @@ import {
   TouchableOpacity, StyleSheet, Text, View,
 } from 'react-native';
 import PropTypes from 'prop-types';
-import appStyle from '../const/globalStyles';
+import appStyle from '../../const/appStyles';
 
 const styles = StyleSheet.create({
   container: {
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'white',
     margin: 5,
-    backgroundColor: 'black', // change later
+    backgroundColor: 'black',
   },
   street: {
     fontSize: 15,

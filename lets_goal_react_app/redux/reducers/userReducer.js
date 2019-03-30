@@ -4,7 +4,6 @@ import {
   AUTHENTICATING_USER,
   REGISTER_SUCCESS,
   REGISTER_FAIL,
-  USER_DETAILS,
   SIGN_OUT,
 } from '../actions/types';
 

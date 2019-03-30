@@ -58,10 +58,10 @@ export const updateUserDetails = user => async (dispatch, getState) => {
       throw new Error(errorMsg);
     }
 
-    const user = await response.json();
+    const userId = await response.json();
 
-    dispatch({ type: USER_DETAILS, payload: user });
-    dispatch({ type: UPDATE_USER_DETAIL_SUCCESS, payload: user });
+    dispatch({ type: USER_DETAILS, payload: userId });
+    dispatch({ type: UPDATE_USER_DETAIL_SUCCESS, payload: userId });
   } catch (e) {
     dispatch({ type: UPDATE_USER_DETAIL_FAIL, payload: e.message });
   }
