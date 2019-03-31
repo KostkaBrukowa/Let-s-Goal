@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import { BOTTOM_ICON_SIZE } from '../const/const';
+import { BOTTOM_ICON_SIZE } from '../../const/const';
 
 function VectorImageButton({
   onPress, iconName, size, color,
@@ -23,7 +23,7 @@ VectorImageButton.propTypes = {
 };
 
 VectorImageButton.defaultProps = {
-  onPress: () => {},
+  onPress: null,
   size: BOTTOM_ICON_SIZE,
   color: 'white',
 };

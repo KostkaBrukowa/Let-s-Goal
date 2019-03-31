@@ -1,11 +1,19 @@
-import React, { Component, PureComponent } from 'react';
+import React, { Component } from 'react';
 import {
-  Easing, Animated, View, Button,
+  Easing, Animated, View, Button, StyleSheet,
 } from 'react-native';
 import PropTypes from 'prop-types';
 
 import Info from './Info';
 import { PURPLE_APP_TINT } from '../../const/const';
+import appStyle from '../../const/appStyles';
+
+const styles = StyleSheet.create({
+  container: {
+    ...appStyle.container,
+    flex: 1,
+  },
+});
 
 export default class InfoTile extends Component {
   static propTypes = {
@@ -19,8 +27,7 @@ export default class InfoTile extends Component {
   };
 
   state = {
-    animatedValue: new Animated.Value(0.0),
-    buttonDisabled: true,
+    animatedOpacity: new Animated.Value(0.0),
   };
 
   shouldComponentUpdate = (nextProps) => {
@@ -42,9 +49,9 @@ export default class InfoTile extends Component {
   };
 
   setVisibility = () => {
-    const { animatedValue } = this.state;
+    const { animatedOpacity } = this.state;
     const { visible } = this.props;
-    Animated.timing(animatedValue, {
+    Animated.timing(animatedOpacity, {
       toValue: visible ? 1 : 0,
       duration: 200,
       useNativeDriver: true,
@@ -62,16 +69,9 @@ export default class InfoTile extends Component {
       onButtonPress,
       visible,
     } = this.props;
-    const { animatedValue, buttonDisabled } = this.state;
+    const { animatedOpacity } = this.state;
     return (
-      <Animated.View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          opacity: animatedValue,
-        }}
-      >
+      <Animated.View style={[styles.container, { opacity: animatedOpacity }]}>
         <Info text={street} />
         <Info text={date.substring(0, 10).replace(/-/g, '.')} />
         <Info text={`${currentPlayers}/${maxPlayers}`} />

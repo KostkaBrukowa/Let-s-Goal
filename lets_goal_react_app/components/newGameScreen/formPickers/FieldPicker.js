@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import InputImage from '../InputImage';
-import NavigationService from '../../navigators/NavigationService';
+import NavigationService from '../../../navigators/NavigationService';
 
 const FieldPicker = (props) => {
   const { field, fieldErrors } = props;

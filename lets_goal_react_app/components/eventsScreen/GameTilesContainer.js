@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import appStyle from '../../const/globalStyles';
+import appStyle from '../../const/appStyles';
 
 const styles = StyleSheet.create({
   container: {

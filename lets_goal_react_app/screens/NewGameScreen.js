@@ -1,19 +1,17 @@
 /* eslint-disable react/require-default-props */
 import React, { Component } from 'react';
-import {
-  StyleSheet, KeyboardAvoidingView, Text, Dimensions,
-} from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import BackgroundImageScroll from '../components/BackGroundImageScroll';
-import DateTimePicker from '../components/formPickers/DateTime';
+import BackgroundImageScroll from '../components/common/BackGroundImageScroll';
+import DateTimePicker from '../components/newGameScreen/formPickers/DateTime';
 import { pickName, pickPlayers, pickField } from '../redux/actions/gameFormActions';
 import { saveGame } from '../redux/actions/gameManagerActions';
-import FourDots from '../components/FourDots';
-import TextPicker from '../components/formPickers/TextPicker';
-import FieldPicker from '../components/formPickers/FieldPicker';
-import ImageButton from '../components/ImageButton';
+import FourDots from '../components/newGameScreen/FourDots';
+import TextPicker from '../components/newGameScreen/formPickers/TextPicker';
+import FieldPicker from '../components/newGameScreen/formPickers/FieldPicker';
+import VectorImageButton from '../components/common/VectorImageButton';
 
 const styles = StyleSheet.create({
   scrollStyle: {
@@ -24,20 +22,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: '3%',
     paddingBottom: '15%',
-    opacity: 1,
   },
 });
 
 export class NewGameScreen extends Component {
-  static navigationOptions = {
-    headerRight: <Text>New game screen</Text>,
-  };
-
   static navigationOptions = ({ navigation }) => {
     const submitForm = navigation.getParam('submitForm');
 
     return {
-      headerRight: <ImageButton onPress={submitForm} iconName="check" />,
+      headerRight: <VectorImageButton onPress={submitForm} iconName="check" />,
     };
   };
 
@@ -49,11 +42,11 @@ export class NewGameScreen extends Component {
     saveGame: PropTypes.func.isRequired,
     pickName: PropTypes.func.isRequired,
     pickPlayers: PropTypes.func.isRequired,
+    navigation: PropTypes.object.isRequired,
   };
 
   componentDidMount = () => {
-    const { navigation } = this.props;
-    navigation.setParams({
+    this.props.navigation.setParams({
       submitForm: this.submit,
     });
   };
@@ -84,12 +77,13 @@ export class NewGameScreen extends Component {
     const { height: windowHeight } = Dimensions.get('window');
     return (
       <BackgroundImageScroll
+        // eslint-disable-next-line no-return-assign
         scrollRef={scroll => (this.scroll = scroll)}
         containerStyle={{ paddingBottom: '4%' }}
       >
         <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
           <TextPicker
-            value={name.value}
+            submitedValue={name.value}
             errors={name.errors}
             pickValue={pickName}
             title="Pick a name"
@@ -98,13 +92,13 @@ export class NewGameScreen extends Component {
           />
           <FourDots />
           <TextPicker
-            value={playersNumber.value}
+            submitedValue={playersNumber.value}
             errors={playersNumber.errors}
             pickValue={pickPlayers}
             title="Pick number of players"
             icon="torsos-all"
             keyboardType="numeric"
-            width={0.25}
+            screenWidth={0.25}
             onFocus={() => this.scrollTo(windowHeight * 0.29)}
           />
           <FourDots />
@@ -124,12 +118,14 @@ const mapStateToProps = state => ({
   date: state.gameForm.date.value,
 });
 
+const mapDispatchToProps = {
+  pickName,
+  pickPlayers,
+  pickField,
+  saveGame,
+};
+
 export default connect(
   mapStateToProps,
-  {
-    pickName,
-    pickPlayers,
-    pickField,
-    saveGame,
-  },
+  mapDispatchToProps,
 )(NewGameScreen);

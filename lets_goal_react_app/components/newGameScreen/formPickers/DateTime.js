@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
-import {
-  View, Text, StyleSheet, ImageBackground,
-} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import InputImage from '../InputImage';
-import { pickDate } from '../../redux/actions/gameFormActions';
+import { pickDate } from '../../../redux/actions/gameFormActions';
+import { ERROR_COLOR } from '../../../const/const';
 
 const styles = StyleSheet.create({
   error: {
-    color: 'red',
+    color: ERROR_COLOR,
     textAlign: 'center',
     fontSize: 17,
   },
@@ -46,11 +45,9 @@ class DateTimePickerTester extends Component {
   render() {
     const { isDateTimePickerVisible } = this.state;
     const { date, dateErrors } = this.props;
-    const isSelected = date != null && !dateErrors; // TODO and there is no errors
-    // TODO ERROR HANDLING
+    const isSelected = date != null && !dateErrors;
     return (
       <View>
-        {/* <ImageBackground  */}
         <InputImage
           icon="calendar"
           onPress={this.showDateTimePicker}

@@ -31,7 +31,7 @@ class UserDetailsTests(APITestCase):
         response = self.client.get('/accounts/details/')
 
         self.assertEqual(response.status_code,
-                         status.HTTP_405_METHOD_NOT_ALLOWED)
+                         status.HTTP_404_NOT_FOUND)
 
     def test_get_update_user_details_if_owner(self):
         """testing that user can update game if he's an owner"""
@@ -96,7 +96,6 @@ class UserDetailsTests(APITestCase):
         '''test if all user details are updated afted removing a game'''
         game = create_game("test_game", players=[
             1, 2], owner=User.objects.get(pk=1))
-        print(game.players.first())
         owner = User.objects.get(pk=1).details
         joinee = User.objects.get(pk=2).details
         prev_owner_created_count = owner.created_events_number

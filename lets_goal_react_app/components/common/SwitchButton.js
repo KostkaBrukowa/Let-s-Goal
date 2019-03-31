@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Button, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { PURPLE_APP_TINT } from '../const/const';
+import { PURPLE_APP_TINT } from '../../const/const';
 
 const styles = StyleSheet.create({
   button: { width: 100, marginTop: 5 },

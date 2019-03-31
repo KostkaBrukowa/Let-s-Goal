@@ -8,13 +8,13 @@ import { connect } from 'react-redux';
 import { Set } from 'immutable';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
 
-import BackgroundImageScroll from '../components/BackGroundImageScroll';
-import GameTile from '../components/GameTile';
+import BackgroundImageScroll from '../components/common/BackGroundImageScroll';
+import GameTile from '../components/common/GameTile';
 import { fetchNearGames } from '../redux/actions/gameAPIActions';
 import { showGame, fetchLocation } from '../redux/actions/appStateActions';
 import InfoTile from '../components/JoinScreen/InfoTile';
 import NavigationService from '../navigators/NavigationService';
-import appStyle from '../const/globalStyles';
+import appStyle from '../const/appStyles';
 
 const styles = StyleSheet.create({
   headerTitle: {
@@ -22,14 +22,12 @@ const styles = StyleSheet.create({
     margin: '3%',
   },
   scrollContainer: {
+    ...appStyle.container,
     height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   tilesContainerStyle: {
+    ...appStyle.container,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     flexWrap: 'wrap',
   },
 });
@@ -79,7 +77,7 @@ export class JoinScreen extends Component {
 
   fetchGames = () => {
     const { fetchNearGames, location } = this.props;
-    location && fetchNearGames(location);
+    if (location) fetchNearGames(location);
   };
 
   goToGameDetails = (game) => {
@@ -95,15 +93,13 @@ export class JoinScreen extends Component {
     });
   };
 
-  render() {
-    const {
-      fields, isFetchingGames, userId, nearGames,
-    } = this.props;
+  renderGameTiles() {
+    const { fields, userId, nearGames } = this.props;
     const { visibleTileSet } = this.state;
     const gameTiles = nearGames
       .filter(game => !game.players.includes(userId))
       .map((game) => {
-        const field = fields.filter(f => f.id === game.playing_field)[0];
+        const field = fields.find(f => f.id === game.playing_field);
         return (
           <GameTile
             key={game.id}
@@ -122,6 +118,12 @@ export class JoinScreen extends Component {
           </GameTile>
         );
       });
+    return gameTiles;
+  }
+
+  render() {
+    const { isFetchingGames } = this.props;
+    const gameTiles = this.renderGameTiles();
 
     return (
       <BackgroundImageScroll
@@ -132,7 +134,7 @@ export class JoinScreen extends Component {
         <Text style={styles.headerTitle}>Near Events</Text>
         {gameTiles.length === 0 ? (
           <Text style={[appStyle.smallTitle, { color: 'lightgray' }]}>
-            Ups... there are no around you
+            Ups... there are no games around you
           </Text>
         ) : (
           <View style={styles.tilesContainerStyle}>{gameTiles}</View>

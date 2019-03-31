@@ -16,23 +16,27 @@ from games.models import Game
 from rest_auth.views import LoginView
 
 
-class UserDetailsViewSet(mixins.CreateModelMixin,
-                         mixins.RetrieveModelMixin,
+class UserDetailsViewSet(mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin,
-                         mixins.DestroyModelMixin,
                          viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated, IsOwner)
     queryset = UserDetails.objects.all()
     serializer_class = UserDetailsSerializer
 
-    def retrieve(self, request, *args, **kwargs):
+    def extra_user_data(self, data):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        data = serializer.data
         data['username'] = instance.user.username
         data['email'] = instance.user.email
         data.pop('user')
-        return Response(data)
+        return data
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return Response(self.extra_user_data(response.data))
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        return Response(self.extra_user_data(response.data))
 
     def get_permissions(self):
         if self.action == 'retrieve' or self.action == None:  # None coz we dont have list mixin
@@ -65,10 +69,3 @@ def update_user_score_after_game_delete(sender, instance=None, **kwargs):
         for player in other_players:
             player.details.joined_events_number = player.details.joined_events_number - 1
             player.details.save()
-
-
-class ExtraDetailsLoginView(LoginView):
-    def get_response(self):
-        data = super().get_response().data
-        data['user_id'] = self.user.id
-        return Response(data=data, status=status.HTTP_200_OK)

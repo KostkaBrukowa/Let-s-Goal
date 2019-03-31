@@ -46,15 +46,15 @@ function DescriptionRow({
         <Text style={[styles.descriptionText, styles.leftDescriptionText]}>{leftText}</Text>
       </View>
       <View style={[styles.rightDescriptionContainer]}>
-        {!editMode ? (
-          <Text style={[styles.descriptionText, styles.rightDescriptionText]}>{rightText}</Text>
-        ) : (
+        {editMode ? (
           <TextInput
             style={[styles.descriptionText, styles.rightDescriptionText, styles.textInput]}
             value={rightText}
             placeholder={leftText.slice(0, -1)}
             onChangeText={onChangeText}
           />
+        ) : (
+          <Text style={[styles.descriptionText, styles.rightDescriptionText]}>{rightText}</Text>
         )}
       </View>
     </View>

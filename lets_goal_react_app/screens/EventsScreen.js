@@ -1,21 +1,16 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity,
-} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
 import { fetchUserGames } from '../redux/actions/gameAPIActions';
 import BottomNavIcon from '../components/icons/navigation/BottomNavIcon';
-import { PURPLE_APP_TINT } from '../const/const';
-import GameTile from '../components/GameTile';
-import BackgroundImageScroll from '../components/BackGroundImageScroll';
+import GameTile from '../components/common/GameTile';
+import BackgroundImageScroll from '../components/common/BackGroundImageScroll';
 import { showGame } from '../redux/actions/appStateActions';
-import NavigationService from '../navigators/NavigationService';
-import EditButton from '../components/userDetails/EditButton';
 import NewGameTile from '../components/userDetails/NewGameTile';
-import VectorImageButton from '../components/ImageButton';
+import VectorImageButton from '../components/common/VectorImageButton';
 import GameTilesContainer from '../components/eventsScreen/GameTilesContainer';
 
 function createGameTile(game, fields, onPress) {
@@ -65,9 +60,9 @@ export class EventsScreen extends Component {
     games: PropTypes.array.isRequired,
     fields: PropTypes.array.isRequired,
     fetchUserGames: PropTypes.func.isRequired,
-    showGame: PropTypes.func.isRequired,
     username: PropTypes.string.isRequired,
     userId: PropTypes.number.isRequired,
+    navigation: PropTypes.object.isRequired,
   };
 
   componentDidMount = () => {
@@ -105,12 +100,11 @@ export class EventsScreen extends Component {
         isLoading={isFetchingGames}
       >
         <View style={[{ paddingRight: '5%', paddingLeft: '5%' }, styles.container]}>
-          {createdGameTiles.length !== 0 && (
-            <GameTilesContainer title="My events">
-              {createdGameTiles}
-              <NewGameTile />
-            </GameTilesContainer>
-          )}
+          <GameTilesContainer title="My events">
+            {/* {createdGameTiles.length !== 0 && createdGameTiles} */}
+            {createdGameTiles}
+            <NewGameTile />
+          </GameTilesContainer>
           {joinedGameTiles.length !== 0 && (
             <GameTilesContainer title="Joined events">{joinedGameTiles}</GameTilesContainer>
           )}

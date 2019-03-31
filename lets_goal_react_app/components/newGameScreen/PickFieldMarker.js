@@ -1,10 +1,9 @@
 import React from 'react';
-import { Text } from 'react-native';
 import PropTypes from 'prop-types';
 import { Marker, Callout } from 'react-native-maps';
 import { connect } from 'react-redux';
 
-import { pickField } from '../redux/actions/gameFormActions';
+import { pickField } from '../../redux/actions/gameFormActions';
 import PickFieldCallout from './PickFieldCallout';
 
 const PickFieldMarker = (props) => {

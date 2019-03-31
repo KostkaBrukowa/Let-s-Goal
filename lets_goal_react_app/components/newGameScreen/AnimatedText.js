@@ -4,29 +4,32 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
+import appStyle from '../../const/appStyles';
+
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 const styles = StyleSheet.create({
   inputText: {
+    ...appStyle.smallTitle,
     textAlign: 'center',
-    color: 'white',
     borderColor: 'white',
-    fontSize: 16,
   },
 });
 
 export default class AnimatedText extends Component {
   static defaultProps = {
     keyboardType: 'default',
-    widthPart: 0.75,
+    screenWidth: 0.75,
   };
 
   static propTypes = {
+    value: PropTypes.string.isRequired,
+    onChangeText: PropTypes.func.isRequired,
     isTextInputVisible: PropTypes.bool.isRequired,
     onBlur: PropTypes.func.isRequired,
     onFocus: PropTypes.func.isRequired,
     keyboardType: PropTypes.string,
-    widthPart: PropTypes.number,
+    screenWidth: PropTypes.number,
   };
 
   constructor(props) {
@@ -37,14 +40,12 @@ export default class AnimatedText extends Component {
   state = {
     isAnimationRunning: false,
     animatedValue: new Animated.Value(0),
-    value: '',
   };
 
   componentDidUpdate = (prevProps) => {
     const { isTextInputVisible } = this.props;
     if (isTextInputVisible !== prevProps.isTextInputVisible) {
       this.toggleInput(prevProps.isTextInputVisible);
-      //   if (isTextInputVisible) this.textInput.current.focus();
     }
   };
 
@@ -58,8 +59,8 @@ export default class AnimatedText extends Component {
   };
 
   runAnimation = ({ toValue, duration }) => {
-    const { animatedValue, value } = this.state;
-    const { isTextInputVisible } = this.props;
+    const { animatedValue } = this.state;
+    const { isTextInputVisible, value } = this.props;
     Animated.timing(animatedValue, {
       toValue,
       duration,
@@ -83,13 +84,11 @@ export default class AnimatedText extends Component {
   };
 
   render() {
-    const { isAnimationRunning, value } = this.state;
-    const {
-      isTextInputVisible, onBlur, onFocus, keyboardType, widthPart,
-    } = this.props;
+    const { isAnimationRunning } = this.state;
+    const { isTextInputVisible, screenWidth } = this.props;
     const { width } = Dimensions.get('window');
     const interpolatedStyle = {
-      width: this.interpolateTo(widthPart * width),
+      width: this.interpolateTo(screenWidth * width),
       borderWidth: this.interpolateTo(1),
       borderRadius: this.interpolateTo(15),
       height: this.interpolateTo(35),
@@ -100,12 +99,13 @@ export default class AnimatedText extends Component {
         {(isAnimationRunning || isTextInputVisible) && (
           <AnimatedTextInput
             ref={this.textInput}
-            onBlur={() => onBlur(value)}
-            onFocus={onFocus}
-            placeholder={!isTextInputVisible ? '' : ''}
-            value={!isTextInputVisible ? '' : value}
-            onChangeText={value => this.setState({ value })}
-            keyboardType={keyboardType}
+            {...this.props}
+            // width={screenWidth * width}
+            // onBlur={() => onBlur(value)}
+            // onFocus={onFocus}
+            // value={value}
+            // onChangeText={value => this.setState({ value })}
+            // keyboardType={keyboardType}
             style={[interpolatedStyle, styles.inputText]}
           />
         )}

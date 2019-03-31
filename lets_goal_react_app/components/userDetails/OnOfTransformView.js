@@ -1,5 +1,5 @@
-import React, { PureComponent, Component } from 'react';
-import { Text, View, Animated } from 'react-native';
+import React, { PureComponent } from 'react';
+import { Animated } from 'react-native';
 import PropTypes from 'prop-types';
 
 class OnOfTransformView extends PureComponent {
@@ -33,6 +33,7 @@ class OnOfTransformView extends PureComponent {
       Animated.timing(animatedValue, {
         toValue: transformOn ? 1 : 0,
         duration: this.props.duration,
+        useNativeDriver: true,
       }).start();
     }
   };

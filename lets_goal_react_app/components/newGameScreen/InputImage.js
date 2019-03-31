@@ -1,24 +1,22 @@
-import Icon from 'react-native-vector-icons/Foundation';
 import {
   Text, TouchableOpacity, View, StyleSheet,
 } from 'react-native';
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
-import SelectedInputIcon from './icons/newGame/SelectedInputIcon';
-import UnselectedInputIcon from './icons/newGame/UnselectedInputIcon';
+import SelectedInputIcon from '../icons/newGame/SelectedInputIcon';
+import UnselectedInputIcon from '../icons/newGame/UnselectedInputIcon';
 import {
   NEW_GAME_CIRCLE_SIZE,
   PURPLE_APP_TINT,
   ALMOST_WHITE_TINT,
   NEW_GAME_ICON_SIZE,
-} from '../const/const';
+  ERROR_COLOR,
+} from '../../const/const';
+import appStyles from '../../const/appStyles';
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  container: appStyles.container,
   imageContainer: {
     width: NEW_GAME_CIRCLE_SIZE,
     height: NEW_GAME_CIRCLE_SIZE,
@@ -32,12 +30,9 @@ const styles = StyleSheet.create({
     backgroundColor: ALMOST_WHITE_TINT,
   },
   error: {
-    borderColor: 'red',
+    borderColor: ERROR_COLOR,
   },
-  title: {
-    color: 'white',
-    fontSize: 17,
-  },
+  title: appStyles.smallTitle,
 });
 
 const InputImage = (props) => {
@@ -53,7 +48,6 @@ const InputImage = (props) => {
             styles.container,
             styles.imageContainer,
             isSelected ? styles.selectedBackgroud : styles.notSelectedBackground,
-            isInvalid ? null : null,
           ]}
         >
           {isSelected ? (
