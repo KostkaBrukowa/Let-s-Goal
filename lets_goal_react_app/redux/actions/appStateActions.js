@@ -45,12 +45,14 @@ export const getUserDetails = userId => async (dispatch, getState) => {
 export const updateUserDetails = user => async (dispatch, getState) => {
   dispatch({ type: UPDATING_USER_DETAILS });
   try {
-    const url = `${BASE_URL}accounts/details/${user.id}`;
+    const url = `${BASE_URL}accounts/details/${user.id}/`;
     const config = {
       ...tokenConfig(getState),
       method: 'PUT',
-      data: JSON.stringify(caseConverter.toSneakCase(user)),
+      body: JSON.stringify(caseConverter.toSnakeCase(user)),
     };
+
+    console.log(caseConverter.toSnakeCase(user));
 
     const response = await timeout(10000, fetch(url, config));
     if (!response.ok) {
@@ -58,12 +60,14 @@ export const updateUserDetails = user => async (dispatch, getState) => {
       throw new Error(errorMsg);
     }
 
-    const userId = await response.json();
+    const responseUser = await response.json();
+    console.log(responseUser);
 
-    dispatch({ type: USER_DETAILS, payload: userId });
-    dispatch({ type: UPDATE_USER_DETAIL_SUCCESS, payload: userId });
+    dispatch({ type: USER_DETAILS, payload: responseUser });
+    dispatch({ type: UPDATE_USER_DETAIL_SUCCESS });
   } catch (e) {
     dispatch({ type: UPDATE_USER_DETAIL_FAIL, payload: e.message });
+    console.log(e);
   }
 };
 

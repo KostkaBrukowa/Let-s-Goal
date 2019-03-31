@@ -100,12 +100,11 @@ export class EventsScreen extends Component {
         isLoading={isFetchingGames}
       >
         <View style={[{ paddingRight: '5%', paddingLeft: '5%' }, styles.container]}>
-          {createdGameTiles.length !== 0 && (
-            <GameTilesContainer title="My events">
-              {createdGameTiles}
-              <NewGameTile />
-            </GameTilesContainer>
-          )}
+          <GameTilesContainer title="My events">
+            {/* {createdGameTiles.length !== 0 && createdGameTiles} */}
+            {createdGameTiles}
+            <NewGameTile />
+          </GameTilesContainer>
           {joinedGameTiles.length !== 0 && (
             <GameTilesContainer title="Joined events">{joinedGameTiles}</GameTilesContainer>
           )}

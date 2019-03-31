@@ -125,10 +125,10 @@ export class LoginScreen extends Component {
               textStyle={styles.buttonTitle}
               onPress={() => this.registerUser()}
               title="Sign up"
-              color="white"
+              color={PURPLE_APP_TINT}
             />
           ) : (
-            <ActivityIndicator size={46} color={PURPLE_APP_TINT} />
+            <ActivityIndicator size={46} color="white" />
           )}
           <DescriptionWithLink
             description="Have an account?"

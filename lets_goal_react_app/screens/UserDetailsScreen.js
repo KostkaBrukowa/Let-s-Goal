@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Header } from 'react-navigation';
 
-import { getUserDetails } from '../redux/actions/appStateActions';
+import { getUserDetails, updateUserDetails } from '../redux/actions/appStateActions';
 import { signOut } from '../redux/actions/authActions';
 import FullScreenActivityIndicator from '../components/userDetails/FullScreenActivityIndicator';
 import BackgroundImage from '../components/common/BackgroundImage';
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   lowerContainer: {
     alignItems: 'center',
     justifyContent: 'space-evenly',
-    flex: 14,
+    flex: 11,
     marginBottom: '13%',
   },
   button: {
@@ -74,6 +74,7 @@ class UserDetailsScreen extends Component {
     fetchingUserDetails: PropTypes.bool.isRequired,
     getUserDetails: PropTypes.func.isRequired,
     signOut: PropTypes.func.isRequired,
+    updateUserDetails: PropTypes.func.isRequired,
     // redux state
     user: PropTypes.object,
     navigation: PropTypes.object.isRequired,
@@ -112,6 +113,22 @@ class UserDetailsScreen extends Component {
   };
 
   toggleEditMode = () => {
+    const { editMode } = this.state;
+    if (editMode === true) {
+      const { user } = this.state;
+      const { user: prevUser } = this.props;
+      const updatedUser = Object.keys(user).reduce(
+        (obj, key) => {
+          const value = user[key];
+          const prevValue = prevUser[key];
+          if (value === prevValue) return obj;
+          return { ...obj, [key]: value };
+        },
+        { id: user.id },
+      );
+      if (Object.keys(updatedUser).length > 1) this.props.updateUserDetails(updatedUser);
+    }
+
     this.setState(state => ({ positionFlipped: !state.positionFlipped }));
     setTimeout(
       () => this.setState(state => ({ editMode: !state.editMode })),
@@ -120,7 +137,7 @@ class UserDetailsScreen extends Component {
   };
 
   editObject = fieldName => ({
-    editMode: this.state.editMode,
+    editMode: fieldName !== 'email' ? this.state.editMode : false,
     onChangeText: value => this.setState(state => ({
       user: {
         ...state.user,
@@ -131,7 +148,7 @@ class UserDetailsScreen extends Component {
 
   renderDescritptionRows = () => {
     const { user } = this.state;
-    const labels = ['firstName', 'lastName', 'birthDate', 'email', 'address', 'preferedPosition'];
+    const labels = ['firstName', 'lastName', 'email', 'address', 'preferedPosition'];
 
     // simple 'firstName' ===> 'First name:'
     const labelToInfoText = (label) => {
@@ -223,5 +240,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getUserDetails, signOut },
+  { getUserDetails, signOut, updateUserDetails },
 )(UserDetailsScreen);
