@@ -8,7 +8,7 @@ React-Redux and for backed i used Django.
 
 ## Demo
 
-[![thumbnail.png](thumbnail.png)](https://www.youtube.com/watch?v=Vy0HbI0DKj0&t)
+[![](Thumbnail.png)](https://www.youtube.com/watch?v=Vy0HbI0DKj0&t)
 
 
 ### Prerequisites
