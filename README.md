@@ -10,7 +10,7 @@ React-Redux and for backed i used Django.
 
 [![](Thumbnail.png)](https://www.youtube.com/watch?v=Vy0HbI0DKj0&t)
 
-
+<!-- 
 ### Prerequisites
 
 What things you need to install the software and how to install them
@@ -18,6 +18,8 @@ What things you need to install the software and how to install them
 Android Studio(android emulator) https://developer.android.com/studio/run/emulator
 
 npm or yarn package manager https://yarnpkg.com/lang/en/
+
+python https://www.python.org/
 
 ### Installing
 
@@ -37,6 +39,25 @@ npm run a
 ```
 
 App should then run on your emulator.
+
+Then you should go to the root folder and run command
+
+```
+pip install pipenv
+```
+
+Wait until installation if finished then
+
+```
+pipenv install
+pipenv shell
+```
+
+Then go to the goal_server directory and type
+
+```
+python manage.py runserver
+ -->
 
 
 ## Built With
