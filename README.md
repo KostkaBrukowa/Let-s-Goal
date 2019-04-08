@@ -7,6 +7,7 @@ Front end of an app is done in React Native(only for android), the position of s
 React-Redux and for backed i used Django.
 
 ## Demo
+Click!
 
 [![](Thumbnail.png)](https://www.youtube.com/watch?v=Vy0HbI0DKj0&t)
 
